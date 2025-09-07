@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.4, maximum-scale=0.4, user-scalable=no">
+    <title>Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+</head>
+<body>
+
+<div id="swipe-area"></div>
+
+  <div class="sidebar" id="sidebar">
+       <h2>🎵 Now Playing</h2>
+    <div class="cover">
+      <img id="cover" src="assets/cover1.jpg" alt="cover">
+    </div>
+    <div class="Title">
+    <h4 id="title">Judul Lagu</h4>
+    <p id="artist">Artis</p>
+    </div>
+    <div class="controls">
+      <button id="prev">⏮</button>
+      <button id="play">▶</button>
+      <button id="next">⏭</button>
+    </div>
+
+    <input type="range" id="seek" min="0" value="0" step="0.1">
+    <div class="lyrics" id="lyrics"></div>
+    <h3>Playlist</h3>
+    <ul id="playlist"></ul>
+
+    <audio id="audio"></audio>
+  </div>
+  </div>
+
+  <div class="content">
+    <h1>Konten Utama</h1>
+    <p>Ini adalah isi halaman website.</p>
+  </div>
+    <header class="header">
+        <a href="#" class="logo">Portfolio</a>
+        <nav class="navbar">
+            <a href="#" style="--i:1"class="active">Home</a>
+            <a href="#about" style="--i:2">About</a>
+            <a href="#services" style="--i:3">Skills</a> <!-- perbaiki 'Skill' menjadi 'Skills' -->
+            <a href="#skills" style="--i:4">Portfolio</a> <!-- perbaiki 'Portofolio' menjadi 'Portfolio' -->
+            <a href="#contact" style="--i:5">Contact</a>
+        </nav>
+    </header>
+    <section class="home" id="home"> <!-- perbaiki 'Home' menjadi 'home' -->
+        <div class="home-content">
+            <h3>Hello, It's Me</h3>
+            <h1>M. Aziz Jaya</h1>
+            <h3>And I am a <span class="text"></span></h3>
+            <p>I am a computer science student</p> <!-- perbaiki teks ke bahasa Inggris -->
+            <div class="home-sci">
+                <a href="https://www.instagram.com/axis_pp_ra?igsh=YjI4OWQ5aXV0YnVy" style="--i:7"><i class='bx bxl-instagram' style="font-size:40px;"></i></box-icon></a>
+                <a href="https://wa.me/+6289508883568" style="--i:8"><i class='bx bxl-whatsapp' style="font-size:40px;"></i></box-icon ></a>
+                <a href="https://www.tiktok.com/@axis_pp_ra" style="--i:9"><i class='bx bxl-tiktok' style="font-size:40px;"></i></box-icon></a>
+                <a href="https://github.com/Ajiskeren" style="--i:10"><i class='bx bxl-github' style="font-size:40px;"></i></box-icon></a>
+            </div>
+            <a href="#contact" class="btn-box1">Contact Me</a>
+        </div>
+        <span class="home-imgHover"></span>
+    </section>
+        <div class="about-text">
+            <h2>About<span>Me</span></h2>
+            <h4>M. Aziz Jaya</h4>
+        </div>
+    <section class="about" id="about">
+        <div class="about-intro">
+        </div>
+        <div class="about-text">
+        <p id="text">
+            Hi! My name is Ajis, and I’m a 9th grade student at SMPN 1 Pesawaran, currently living in Bagelen 1. I’ve always spent most of my time at home, and over the years that became a place where I discovered my interest in technology. I enjoy learning new things, especially when it comes to computers and programming. That curiosity eventually led me to explore several programming languages, including HTML, CSS, JavaScript, and Python.
+  <span id="dots">...</span>
+  <span id="more">
+    Coding for me is not just about writing lines of code—it feels more like creating something meaningful out of nothing. Even though I’m more of an introverted person who doesn’t go out much, I’ve found that through my work—whether it’s building websites or creating other kinds of projects—I can share something valuable with others.I know I still have a long way to go, and there are many things I need to learn. But that doesn’t stop me. Instead, it motivates me to keep improving and to turn every project I create into a step forward. My goal is simple: to make my skills and my creations useful, not just for myself but also for others.
+  </span>
+</p>
+<button onclick="readMore()" id="btn" class="btn-box2">Baca Selengkapnya</button>
+        </div>
+    </section>
+            
+    <section>
+        <div class="services" id="services">
+            <div class="container">
+                <h1 class="sub-title">My <span>services</span></h1>
+                <div class="services-list">
+                    <div>
+                        <i class='bx bx-code' style='color:#ce4dd5'  ></i>
+                        <h2>UI/UX Design</h2>
+                        <p>I provide professional UI/UX design services focused on intuitive, aesthetic and functional user interfaces. I ensure designs that are visually appealing and effective in achieving your business goals for websites, mobile applications, and other digital platforms.</p>
+                        <a href="#contact" class="read">Contact me</a>
+                    </div>
+                    
+    
+                    <div>
+                        <i class='bx bx-crop' style='color:#ce4dd5'  ></i>
+                        <h2>Graphic Design</h2>
+                        <p>I provide creative graphic design services that will bring your ideas to life into stunning visual masterpieces. I ensure each design is not only aesthetic, but also effective in conveying a message, I am ready to help you build a strong and memorable visual identity.</p>
+                        <a href="#contact" class="read">Contact me</a>
+                    </div>
+                    <div>
+                        <i class='bx bxl-visual-studio' style='color:#ce4dd5'></i>
+                        <h2>Frontend Dev</h2>
+                        <p>I offer frontend development services that focus on creating attractive and responsive user interfaces. With expertise in HTML, CSS, and JavaScript, I'm committed to ensuring that every project not only looks great but also functions well across a variety of devices and browsers.</p>
+                        <a href="#contact" class="read">Contact me</a>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section> 
+    <h1 class="sub-title">My <span>Skills</span></h1>
+    <section>
+      
+        <div class="container1" id="skills">
+                <h1 class="heading1">Technical Skills</h1>
+            <div class="Technical-bars">
+            
+                <div class="bar"><i style="color: #c95d2e" class='bx bxl-html5'></i>
+                    <div class="info">
+                        <span>HTML</span>
+                    </div>
+                    <div class="progress-line html">
+                        <span></span>
+                    </div>
+                </div>
+                <div class="bar"><i style="color: #147bbc" class='bx bxl-css3'></i>
+                    <div class="info">
+                        <span>CSS</span>
+                    </div>
+                    <div class="progress-line css">
+                        <span></span>
+                    </div>
+                </div>
+                <div class="bar"><i style="color: #b0bc1e" class='bx bxl-javascript'></i>
+                    <div class="info">
+                        <span>Javascript</span>
+                    </div>
+                    <div class="progress-line javascript">
+                        <span></span>
+                    </div>
+                </div>
+                <div class="bar"><i style="color: #c322c9" class='bx bxl-python'></i>
+                    <div class="info">
+                        <span>Python</span>
+                    </div>
+                    <div class="progress-line python">
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    
+        <div class="container2">
+            <h1 class="heading2">Profesional Skills</h1>
+            <div class="radial-bars">
+
+                <div class="radial-bar">
+                    <svg x="0px" y="0px" viewBox="0 0 200 200">
+                        <circle class="progress-bar" cx="100" cy="100" r="80"></circle>
+                        <circle class="path path-1" cx="100" cy="100" r="80"></circle>
+                    </svg>
+                        <div class="percentage">75%</div>
+                        <div class="text">creativity</div>
+                </div>
+                <div class="radial-bar">
+    
+                    <svg x="0px" y="0px" viewBox="0 0 200 200">
+                        <circle class="progress-bar" cx="100" cy="100" r="80"></circle>
+                        <circle class="path path-2" cx="100" cy="100" r="80"></circle>
+        
+                    </svg>
+                    <div class="percentage">80%</div>
+                    <div class="text">comunication</div>
+                </div>            
+                <div class="radial-bar">
+                    <svg x="0px" y="0px" viewBox="0 0 200 200">
+                        <circle class="progress-bar" cx="100" cy="100" r="80"></circle>
+                        <circle class="path path-3" cx="100" cy="100" r="80"></circle>
+                    </svg>
+                    <div class="percentage">80%</div>
+                    <div class="text">problem solve</div>
+                </div>
+                <div class="radial-bar">
+                    <svg x="0px" y="0px" viewBox="0 0 200 200">
+                        <circle class="progress-bar" cx="100" cy="100" r="80"></circle>
+                        <circle class="path path-4" cx="100" cy="100" r="80"></circle>
+                    </svg>
+                    <div class="percentage">70%</div>
+                    <div class="text">TeamWork</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <section class="contact" id="contact">
+        <div class="contact-text">
+            <h2>Contact <span>Me</span></h2>
+            <h4>Lets work together</h4>
+            <p>I'm glad you've visited my personal portfolio website! If you have any questions, suggestions, or would like to collaborate, please feel free to contact me through this form. I will endeavor to reply to your message as soon as possible.</p>
+            <ul class="contact-list">
+                <li><i class="bx bxs-send"></i> ezdek1231@gmail.com</li>
+                <li><i class="bx bxs-phone"></i> 089508883568</li>
+            </ul>
+        </div>
+    
+    </section>
+
+    <div class="contact-form">
+            <form action="">
+                <input type="text" placeholder="Enter Your Name" required>
+                <input type="email" placeholder="Enter Your Email" required>
+                <input type="text" placeholder="Enter Your Subject">
+                <textarea placeholder="Enter Your Message" required></textarea>
+                <input type="submit" value="Submit" class="send">
+            </form>
+        </div>
+
+        <div class="contact-icons">
+            <a href="https://www.instagram.com/axis_pp_ra?igsh=YjI4OWQ5aXV0YnVy"><i class="bx bxl-instagram"></i></a>
+            <a href="https://wa.me/+6289508883568"><i class="bx bxl-whatsapp"></i></a>
+            <a href="https://www.tiktok.com/@axis_pp_ra"><i class="bx bxl-tiktok"></i></a>
+            <a href="https://github.com/Ajiskeren"><i class="bx bxl-github"></i></a>
+        </div>
+    <div class="last-text">
+        <p>developed with M. Aziz Jaya</p>
+    </div>
+    <a href="#" id="scrollUpBtn" class="top"><i class='bx bx-up-arrow-alt'></i></a>
+    
+    
+    
+    
+        <script src="main.js"></script>
+    </body>
+    </html>
+
