@@ -95,11 +95,14 @@ let currentTrack = 0;
 // Daftar lagu
 const tracks = [
   { title: "Fall in Love Alone", artist: "Stacey Ryan", src: "assets/lagu1.mp3", cover: "assets/cover1.jpg", video: "assets/cover1.mp4" },
-  { title: "Lagu Kedua", artist: "Artis B", src: "assets/lagu2.mp3", cover: "assets/cover2.jpg" },
-  { title: "Lagu Ketiga", artist: "Artis C", src: "assets/lagu3.mp3", cover: "assets/cover3.jpg" },
-  { title: "Lagu Ketiga", artist: "Artis C", src: "assets/lagu4.mp3", cover: "assets/cover4.jpg" },
-  { title: "Lagu Ketiga", artist: "Artis C", src: "assets/lagu5.mp3", cover: "assets/cover5.jpg" },
-  { title: "Lagu Ketiga", artist: "Artis C", src: "assets/lagu6.mp3", cover: "assets/cover6.jpg" }
+  { title: "One The Way", artist: "AiNa The End", src: "assets/lagu2.mp3", cover: "assets/cover2.jpg" },
+  { title: "Best Friends", artist: "Rex Orange", src: "assets/lagu3.mp3", cover: "assets/cover3.jpg" },
+  { title: "Line Without hook", artist: "Rick Montogeomery", src: "assets/lagu4.mp3", cover: "assets/cover4.jpg" },
+  { title: "Every summertime", artist: "NIKI", src: "assets/lagu5.mp3", cover: "assets/cover5.jpg" },
+  { title: "Blue", artist: "Yung Kai", src: "assets/lagu6.mp3", cover: "assets/cover6.jpg" },
+  { title: "Double Take", artist: "Druv", src: "assets/lagu7.mp3", cover: "assets/cover7.jpg" },
+  { title: "Dandelions", artist: "Ruth B.", src: "assets/lagu8.mp3", cover: "assets/cover8.jpg" },
+  { title: "Two Birds", artist: "Regina Spektor", src: "assets/lagu9.mp3", cover: "assets/cover9.jpg" }
 ];
 
 // Render playlist
