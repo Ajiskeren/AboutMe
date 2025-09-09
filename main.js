@@ -43,8 +43,67 @@ function readMore() {
 }
 
 const sidebar = document.getElementById("sidebar");
-let startX = 0;
-let endX = 0;
+const toggleBtn = document.getElementById("toggleBtn");
+
+let x = 100;  // posisi awal X
+let y = 100;  // posisi awal Y
+let dx = 2;   // kecepatan arah X
+let dy = 2;   // kecepatan arah Y
+const speed = 2;
+
+function moveButton() {
+  const btnWidth = toggleBtn.offsetWidth;
+  const btnHeight = toggleBtn.offsetHeight;
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+
+  // Update posisi
+  x += dx * speed;
+  y += dy * speed;
+
+  // Pantulan horizontal
+  if (x + btnWidth >= screenWidth || x <= 0) {
+    dx = -dx;
+  }
+
+  // Pantulan vertikal
+  if (y + btnHeight >= screenHeight || y <= 0) {
+    dy = -dy;
+  }
+
+  // Terapkan posisi
+  toggleBtn.style.left = x + "px";
+  toggleBtn.style.top = y + "px";
+
+  requestAnimationFrame(moveButton);
+}
+
+// Mulai animasi
+moveButton();
+
+
+
+// Fungsi buka/tutup
+function openSidebar() {
+  sidebar.classList.add("open");
+  document.body.classList.add("noscroll");
+  document.documentElement.classList.add("noscroll");
+}
+
+function closeSidebar() {
+  sidebar.classList.remove("open");
+  document.body.classList.remove("noscroll");
+  document.documentElement.classList.remove("noscroll");
+}
+
+// Klik tombol ☰
+toggleBtn.addEventListener("click", () => {
+  if (sidebar.classList.contains("open")) {
+    closeSidebar();
+  } else {
+    openSidebar();
+  }
+});
 
 document.addEventListener("touchstart", (e) => {
   startX = e.touches[0].clientX;
@@ -80,12 +139,15 @@ swipeArea.addEventListener("touchend", (e) => {
   if (diffX > 80) sidebar.classList.add("open");
 });
 
+
+
 const audio = document.getElementById("audio");
 const playBtn = document.getElementById("play");
 const prevBtn = document.getElementById("prev");
 const nextBtn = document.getElementById("next");
 const seek = document.getElementById("seek");
 const cover = document.getElementById("cover");
+const coverImg = document.getElementById("coverImg");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
 const playlistEl = document.getElementById("playlist");
@@ -119,6 +181,7 @@ function loadTrack(index) {
   const track = tracks[currentTrack];
   audio.src = track.src;
   cover.src = track.cover;
+  coverImg.src = track.cover;
   title.textContent = track.title;
   artist.textContent = track.artist;
   
