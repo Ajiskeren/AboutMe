@@ -151,6 +151,10 @@ const coverImg = document.getElementById("coverImg");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
 const playlistEl = document.getElementById("playlist");
+const canvas = document.getElementById("spectrum");
+const ctx = canvas.getContext("2d");
+const current = document.getElementById("current");
+const duration = document.getElementById("duration");
 
 let currentTrack = 0;
 
@@ -164,7 +168,9 @@ const tracks = [
   { title: "Blue", artist: "Yung Kai", src: "assets/lagu6.mp3", cover: "assets/cover6.jpg" },
   { title: "Double Take", artist: "Druv", src: "assets/lagu7.mp3", cover: "assets/cover7.jpg" },
   { title: "Dandelions", artist: "Ruth B.", src: "assets/lagu8.mp3", cover: "assets/cover8.jpg" },
-  { title: "Two Birds", artist: "Regina Spektor", src: "assets/lagu9.mp3", cover: "assets/cover9.jpg" }
+  { title: "Two Birds", artist: "Regina Spektor", src: "assets/lagu9.mp3", cover: "assets/cover9.jpg" },
+  { title: "Devil Disguise", artist: "Marino", src: "assets/lagu10.mp3", cover: "assets/cover10.jpg" },
+  { title: "December", artist: "Neck Deep", src: "assets/lagu11.mp3", cover: "assets/cover11.jpg" }
 ];
 
 // Render playlist
@@ -189,7 +195,7 @@ function loadTrack(index) {
 
   highlightPlaylist();
   audio.play();
-  playBtn.textContent = "⏸";
+  playBtn.textContent = "ツ";
 }
 
 // Highlight playlist
@@ -203,10 +209,10 @@ function highlightPlaylist() {
 playBtn.addEventListener("click", () => {
   if(audio.paused) {
     audio.play();
-    playBtn.textContent = "⏸";
+    playBtn.textContent = "ツ";
   } else {
     audio.pause();
-    playBtn.textContent = "▶";
+    playBtn.textContent = "˙◠˙";
   }
 });
 
@@ -317,7 +323,7 @@ function updateLyrics(currentTime) {
     if (active) {
       active.classList.add("active");
       lyricsEl.scrollTo({
-        top: active.offsetTop - lyricsEl.clientHeight / 0.32,
+        top: active.offsetTop - lyricsEl.clientHeight / 0.27,
         behavior: "smooth"
       });
     }
@@ -329,3 +335,80 @@ function updateLyrics(currentTime) {
 audio.addEventListener("timeupdate", () => {
   updateLyrics(audio.currentTime);
 });
+
+canvas.width = window.innerWidth;
+  canvas.height = 200;
+
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const analyser = audioCtx.createAnalyser();
+
+  analyser.fftSize = 2048; // resolusi detail
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+
+  const source = audioCtx.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioCtx.destination);
+
+  const barCount = 40; // bar besar
+  const smoothed = new Float32Array(barCount);
+
+  function draw() {
+    requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(dataArray);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const barWidth = canvas.width / barCount;
+
+    for (let i = 0; i < barCount; i++) {
+      const percent = i / barCount;
+
+      // log scale index
+      const index = Math.floor(Math.pow(percent, 2.0) * bufferLength); 
+      let value = dataArray[index] || 0;
+
+      // boost high frequency (kanan)
+      const boost = 1 + percent * 2; // makin ke kanan makin naik
+      value *= boost;
+
+      // smoothing
+      smoothed[i] = smoothed[i] * 0.85 + value * 0.15;
+
+      // scaling
+      let barHeight = smoothed[i] * 0.5;
+
+      // biar gak hilang total
+      if (barHeight < 10) barHeight = 10;
+
+      ctx.fillStyle = "#00ffcc";
+      ctx.fillRect(
+        i * barWidth,
+        canvas.height - barHeight,
+        barWidth - 4,
+        barHeight
+      );
+    }
+  }
+
+  audio.onplay = () => {
+    audioCtx.resume().then(draw);
+  };
+
+  // format detik -> menit:detik
+  function formatTime(sec) {
+    if (isNaN(sec)) return "0:00";
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${s < 10 ? "0" + s : s}`;
+  }
+
+  // update total durasi setelah metadata siap
+  audio.addEventListener("loadedmetadata", () => {
+    duration.textContent = formatTime(audio.duration);
+  });
+
+  // update current time selama audio play
+  audio.addEventListener("timeupdate", () => {
+    current.textContent = formatTime(audio.currentTime);
+  });

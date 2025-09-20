@@ -80,7 +80,7 @@ header {
   width: 80%;
   height: 100vh;
   background: transparent;
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(10px);
   border: 1px solid gray;
   padding: 20px;
   transition: 0.6s;
@@ -847,16 +847,15 @@ section{
 
 
 .cover img {
-    padding: 20px;
-  width: 100%;
-  border-radius: 10px;
-  margin-bottom: 10px;
+    width: 100%;
+    padding-top: 15px;
+    border-radius: 10px;
 }
 
 .controls {
   display: flex;
   justify-content: space-around;
-  margin: 10px 0;
+  margin: 20px 0;
 }
 
 .controls button {
@@ -881,20 +880,30 @@ section{
     font-size: 32px;
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin-top: 20px;
 }
 #playlist li {
+    width: 100%;
     font: size 32px;
-  padding: 6px 10px;
+  padding: 10px 40px;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius:0px;
 }
 #playlist li:hover {
   background: rgba(255,255,255,0.1);
 }
 #playlist li.active {
-  background: rgba(0,255,204,0.3);
+  background: rgba(255, 8, 247, 0.3);
   font-weight: bold;
+}
+
+.playlist {
+    width: 100%;
+    display: block;
+    background: rgba(0, 0, 0, 0.500);
+    backdrop-filter: blur(50px);
+    border: 2px solid gray;
+    border-radius: 8px;
 }
 
 .content {
@@ -903,9 +912,10 @@ section{
 }
 
 .lyrics {
-  background: rgba(255,255,255,0.05);
+  background: rgba(0, 0, 0, 0.600);
   padding: 10px;
   border-radius: 8px;
+  border: 2px;
   margin: 10px 0;
   max-height: 350px;
   overflow-y: auto;
@@ -919,8 +929,8 @@ section{
 
 .lyrics p {
     font-size: 32px;
-  margin: 2px 0;
-  transition: color 0.3s;
+    margin: 2px 0;
+    transition: color 0.3s;
 }
 .lyrics p.active {
   color: #ff00dd;
@@ -935,6 +945,28 @@ section{
 
 .Title {
     font-size: 32px;
+    margin: 20px;
+    display: flex;
 }
 
+.title {
+    
+    width: 60%;
+}
 
+.time {
+    width: 40%;
+    text-align: center;
+    margin: 10px 0px;
+    font-size: 35px;
+}
+
+.spectrum {
+      width: 100%;
+      height: 180px;
+      display: block;
+      background: rgba(0, 0, 0, 0.500);
+      backdrop-filter: blur(50px);
+      border: 2px solid gray;
+      border-radius: 8px;
+    }
