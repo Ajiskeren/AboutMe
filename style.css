@@ -6,6 +6,10 @@
     font-family: 'poppins', sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
     color: #ededed;
     background: #081b29;
@@ -111,8 +115,6 @@ header {
     text-decoration: none;
     font-weight: 600;
     cursor: default;
-    opacity: 0;
-    animation: slideRight 1s ease forwards;
 }
 
 .navbar a {
@@ -134,12 +136,35 @@ header {
 .home {
     position: relative;
     margin-top: 100px;
-    background: url('wallpaper.jpg') no-repeat center center;
+    background: url('wallpaper.') no-repeat center center;
     background-size: cover;
     display: flex;
     justify-content: left; /* Agar konten berada di sebelah kiri */
     align-items: center; /* Agar konten berada di tengah secara vertikal */
     padding: 70px 5% 0; /* Padding horizontal untuk memberi ruang di sisi kiri dan kanan */
+}
+
+.Walpaper {
+    height: 390px;
+    width: 390px;
+      display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30px #ce4dd5;
+    position: absolute;
+    top: 4%;
+    right: 5%;
+    border-radius: 50%;
+}
+
+.Walpaper img {
+    border-radius: 50%;
+    width: 367px;
+    height: 367px;
+}
+
+#coverMain {
+  transition: opacity 1s ease-in-out; /* efek memudar halus */
 }
 
 
@@ -152,24 +177,25 @@ header {
     font-weight: 700;
     opacity: 0;
     animation: slideBottom 1s ease forwards;
-    animation-delay: .7s;
+    animation-delay: 1s;
 }
 .home-content h3:nth-of-type(2){
     margin-bottom: 30px;
     animation: slideTop 1s ease forwards;
-    animation-delay: .7s;
+    animation-delay: 0.7s;
 }
 .home-content h1 {
     font-size: 50px;
     color: #ce4dd5;
     font-weight: 800;
-    margin: -3px 0;
+    margin: 0px 0;
     opacity: 0;
     animation: slideRight 1s ease forwards;
     animation-delay: 1s; 
 }
 
 .home-content p {
+    margin-top: -20px;
     font-size: 20px;
     opacity: 0;
     animation: slideLeft 1s ease forwards;
@@ -258,6 +284,10 @@ header {
     margin-bottom: 20px;
 }
 
+.about-text {
+    justify-content: center;
+}
+
 .about-text h2{
     font-size: 60px;
     justify-content: center;
@@ -287,6 +317,8 @@ header {
 
 
 #services{
+    display: flex;
+    justify-content: center;
     color: aliceblue;
     font-size: 20px;
     line-height: 1.4;
@@ -368,6 +400,7 @@ section{
     flex-wrap: wrap;
 }
 .container1{
+    align-items: center;
     width: 100%;
     height: 800px;
     padding: 10px 50px;
@@ -383,6 +416,7 @@ section{
 }
 
 .container2{
+    align-items: center;
     width: 100%;
     height: 800px;
     padding: 10px 50px;
@@ -550,7 +584,7 @@ section{
 }
 @keyframes animate-bar{
     100%{
-        stroke-dashoffset -1;
+        stroke-dashoffset: -1;
     }
 }
 .path {
@@ -672,9 +706,6 @@ section{
     margin-top: 130px;
 }
 
-.contact-text{
-
-}
 
 .contact-text h2{
     text-align: center;
@@ -970,3 +1001,124 @@ section{
       border: 2px solid gray;
       border-radius: 8px;
     }
+
+    .toggle-btnS{
+  position: fixed;
+  top: 10%;
+  Right: 15px;
+    background: transparent;
+  backdrop-filter: blur(10px);
+  border: 1px solid gray;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 32px;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.toggle-btnST{
+position: fixed;
+color: white;
+border: none;
+padding: 10px 15px;
+font-size: 66px;
+cursor: pointer;
+z-index: 1001;
+}
+
+.Btnss {
+    height: 50px;
+}
+
+
+/* Sidebar */
+.sidebar-container {
+    display: flex;
+    flex-direction: column;
+  position: fixed;
+  top: 0;
+  right: -260px; /* disembunyikan awal */
+  width: 20%;
+  height: 2000px;
+    background: transparent;
+  backdrop-filter: blur(10px);
+  border: 1px solid gray;
+  color: white;
+  padding: 0px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+  transition: right 0.3s ease;
+  z-index: 1000;
+}
+
+.sidebar-container.active {
+  right: 0; /* muncul */
+}
+
+.weather-widget {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.weather-title {
+    font-size: 62px;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+.weather-horizontal {
+  writing-mode: vertical-rl; /* bikin tulisan menyamping */
+  transform: rotate(0deg); /* biar bacanya dari bawah ke atas */
+  font-size: 3.6em;
+  line-height: 2;
+  display: inline-block;
+  transition: transform 0s ease;
+  cursor: pointer;
+}
+
+
+.sidebar-widget {
+    padding-top: 50%;
+}
+
+.sidebar-widgetJ {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  padding: 25px;
+  border-radius: 10px;
+}
+
+.widget-time {
+    background: transparent;
+  backdrop-filter: blur(10px);
+  border: 1px solid gray;
+  display: flex;
+  flex-direction: column; /* susun ke bawah */
+  justify-content: space-evenly;
+  height:300px;
+  align-items: center;
+  font-size: 2em;
+  font-weight: bold;
+  gap: 10%; /* jarak antar baris */
+  border-radius: 12px;
+  margin-bottom: 40px;
+}
+
+
+.tanggal-box {
+    margin-bottom: 20px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #fff;               /* teks putih */
+      background: transparent;
+  backdrop-filter: blur(10px);
+  border: 1px solid gray;
+  padding: 10px 15px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  letter-spacing: 0.5px;
+}

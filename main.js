@@ -1,10 +1,11 @@
 var typed = new Typed(".text", {
-    strings: ["Axis", "Frontend Developer", "Web Developer"],
+    strings: ["Axis", "Beginnner", "Rey Ace"],
     typeSpeed: 100,
     backSpeed: 100,
     backDelay: 1000,
     loop: true
 });
+
 
 // Ambil tombol scroll-up dan section home
 const scrollBtn = document.getElementById("scrollUpBtn");
@@ -148,6 +149,7 @@ const nextBtn = document.getElementById("next");
 const seek = document.getElementById("seek");
 const cover = document.getElementById("cover");
 const coverImg = document.getElementById("coverImg");
+const coverMain = document.getElementById("coverMain");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
 const playlistEl = document.getElementById("playlist");
@@ -155,6 +157,8 @@ const canvas = document.getElementById("spectrum");
 const ctx = canvas.getContext("2d");
 const current = document.getElementById("current");
 const duration = document.getElementById("duration");
+let showOmori = false;
+const customImage = "Omori-Normal.gif";
 
 let currentTrack = 0;
 
@@ -173,6 +177,31 @@ const tracks = [
   { title: "December", artist: "Neck Deep", src: "assets/lagu11.mp3", cover: "assets/cover11.jpg" }
 ];
 
+// fungsi ganti cover dengan transisi
+function setCover(src) {
+  coverMain.style.opacity = 0; // mulai fade out
+  setTimeout(() => {
+    coverMain.src = src;       // ganti gambar
+    coverMain.style.opacity = 1; // fade in
+  }, 500);
+}
+
+// fungsi toggle Omori <-> cover lagu
+function toggleCover() {
+  if (showOmori) {
+    setCover(tracks[currentTrack].cover);
+  } else {
+    setCover(customImage);
+  }
+  showOmori = !showOmori;
+}
+
+// otomatis ganti tiap 5 detik
+setInterval(toggleCover, 5000);
+
+// bisa juga ganti manual kalau diklik
+coverMain.addEventListener("click", toggleCover);
+
 // Render playlist
 tracks.forEach((track, i) => {
   const li = document.createElement("li");
@@ -188,6 +217,7 @@ function loadTrack(index) {
   audio.src = track.src;
   cover.src = track.cover;
   coverImg.src = track.cover;
+  coverMain.src = track.cover;
   title.textContent = track.title;
   artist.textContent = track.artist;
   
@@ -412,3 +442,115 @@ canvas.width = window.innerWidth;
   audio.addEventListener("timeupdate", () => {
     current.textContent = formatTime(audio.currentTime);
   });
+
+  // Toggle Sidebar
+const sidebarS = document.getElementById("sidebarS");
+const openBtn = document.getElementById("openBtn");
+const closeBtn = document.getElementById("closeBtn");
+
+// Buka sidebar
+openBtn.addEventListener("click", () => {
+  sidebarS.classList.add("active");
+  openBtn.style.display = "none"; // sembunyikan tombol luar
+});
+
+// Tutup sidebar
+closeBtn.addEventListener("click", () => {
+  sidebarS.classList.remove("active");
+  openBtn.style.display = "block"; // munculkan lagi tombol luar
+});
+
+function updateTime() {
+  const now = new Date();
+  document.getElementById('hours').textContent = String(now.getHours()).padStart(2, '0');
+  document.getElementById('minutes').textContent = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('seconds').textContent = String(now.getSeconds()).padStart(2, '0');
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+async function getWeather(city) {
+  const url = `https://wttr.in/${city}?format=%C+%t`;
+
+  // Lebih banyak emoji
+  const weatherIcons = {
+    "sunny": "☀️🌞🔥",
+    "clear": "🌞✨🌙",
+    "cloud": "☁️🌥️🌤️",
+    "partly": "⛅🌤️🌥️",
+    "overcast": "🌥️☁️🌫️",
+    "rain": "🌧️🌦️💧",
+    "shower": "🌦️🌧️☔",
+    "thunder": "⛈️⚡🌩️",
+    "storm": "🌪️🌩️⛈️",
+    "drizzle": "💧🌦️☁️",
+    "mist": "🌫️🌁💨",
+    "fog": "🌫️🌁👓",
+    "snow": "❄️☃️⛄",
+    "ice": "🧊❄️🥶",
+    "wind": "💨🍃🌬️",
+    "hot": "🔥🥵🌞",
+    "cold": "🥶❄️🧊"
+  };
+
+  try {
+    const res = await fetch(url);
+    let data = await res.text(); // contoh: "Partly cloudy +29°C"
+
+    let icon = "🌍";
+    const desc = data.toLowerCase();
+
+    for (let key in weatherIcons) {
+      if (desc.includes(key)) {
+        icon = weatherIcons[key];
+        break;
+      }
+    }
+
+    document.getElementById("weather").textContent = `${icon} Bagelen: ${data}`;
+  } catch (err) {
+    document.getElementById("weather").textContent = "⚠️ Gagal memuat cuaca";
+  }
+}
+
+// Jalankan untuk Bagelen, Pesawaran
+getWeather("Bagelen+Pesawaran");
+
+// Auto-refresh tiap 10 menit
+setInterval(() => getWeather("Bagelen+Pesawaran"), 600000);
+
+(function(){
+  emailjs.init("vusiDp2YuSkT0-mcC"); // Public Key dari EmailJS
+})();
+
+document.addEventListener("DOMContentLoaded", function() {
+  document.getElementById("contactForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    emailjs.sendForm("service_2fde5xv", "template_jj81348", this)
+      .then(function(){
+        alert("✅ Pesan berhasil dikirim!");
+      }, function(error){
+        alert("❌ Gagal: " + JSON.stringify(error));
+      });
+  });
+});
+
+function tampilkanTanggal() {
+  const sekarang = new Date();
+
+  const hari = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+  const bulan = ["Januari","Februari","Maret","April","Mei","Juni",
+                 "Juli","Agustus","September","Oktober","November","Desember"];
+
+  const namaHari = hari[sekarang.getDay()];
+  const tanggal = sekarang.getDate();
+  const namaBulan = bulan[sekarang.getMonth()];
+  const tahun = sekarang.getFullYear();
+
+  document.getElementById("tanggal").textContent = 
+    `${namaHari}, ${tanggal} ${namaBulan} ${tahun}`;
+}
+
+// Jalankan saat halaman dimuat
+tampilkanTanggal();
