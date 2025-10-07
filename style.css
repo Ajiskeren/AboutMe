@@ -32,11 +32,11 @@ header {
 
 #swipe-area {
   position: fixed;
-  top: 0px;
+  top: 10px;
   left: 0;
   width: 100px;   /* area sensitif geser */
-  height: 100%;
-  z-index: 10000;
+  height: 80%;
+  z-index: 1;
 }
 
 .toggle-btn {
@@ -49,7 +49,7 @@ header {
   font-size: 20px;
   border-radius: 5px;
   cursor: pointer;
-  z-index: 10000;
+  z-index: 6;
 }
 
 .disc {
@@ -89,7 +89,7 @@ header {
   border: 1px solid gray;
   padding: 10px 2dvh 10px 10px;
   transition: 0.6s;
-  z-index: 9999;
+  z-index: 5;
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
   scrollbar-width: none;
@@ -122,6 +122,7 @@ header {
     display: flex;
     justify-content: space-evenly;
     width: 65%;
+    z-index: 7;
 }
 
 .navbar a {
@@ -147,6 +148,7 @@ header {
     justify-content: left; /* Agar konten berada di sebelah kiri */
     align-items: center; /* Agar konten berada di tengah secara vertikal */
     padding: 70px 5% 0; /* Padding horizontal untuk memberi ruang di sisi kiri dan kanan */
+    z-index: 4;
 }
 
 .Walpaper {
@@ -249,7 +251,6 @@ header {
     justify-content: center;
     align-items: center;
     flex-wrap: nowrap;
-
 }
 .btn-box1:hover{
     box-shadow: 0 0 5px purple,
@@ -272,6 +273,7 @@ header {
     text-align: center;
     box-shadow: 0 0 5px #ce4dd5,
     0 0 25px #ce4dd5;
+    z-index: 3;
 }
 .btn-box2:hover{
     box-shadow: 0 0 5px purple,
@@ -285,6 +287,7 @@ header {
     padding: 0px 20px;
     text-align: center;
 }
+
 .about-intro{
     display: flex;
     align-items: center;
@@ -329,6 +332,7 @@ header {
     font-size: 20px;
     line-height: 1.4;
     margin-bottom: 4rem;
+    z-index: 2;
 }
 .sub-title{
     text-align: center;
@@ -427,7 +431,7 @@ section{
 
 .container2{
     width: 100%;
-     justify-content: center;
+    justify-content: center;
     align-items: center;
     padding: 10px 50px;
     font-size: 13px;
@@ -806,7 +810,7 @@ section{
 .contact-form form{
     position: relative;
     padding: 30px;
-
+    z-index: 2;
 }
 .contact-form form input, .contact-form form textarea{
     border: none;
@@ -1062,7 +1066,7 @@ section{
   padding: 0px;
   box-shadow: 2px 0 10px rgba(0,0,0,0.3);
   transition: right 0.3s ease;
-  z-index: 1000;
+  z-index: 8;
 }
 
 .sidebar-container.active {
