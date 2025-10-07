@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.4, maximum-scale=0.4, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Portfolio</title>
     <link rel="stylesheet" href="style.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -12,7 +12,7 @@
 <body>
 
       <!-- Tombol Toggle -->
-  <button id="openBtn"><i class='bx toggle-btnS bxs-left-arrow-alt' style="font-size: 55px;"></i></button>
+  <button id="openBtn"><i class='bx toggle-btnS bxs-left-arrow-alt' style="font-size: 25px;"></i></button>
 
 <div id="swipe-area"></div>
 
@@ -40,16 +40,16 @@
     </div>
     <div><canvas class="spectrum" id="spectrum"></canvas></div>
     <div id="PPN" class="controls">
-      <button id="prev"><i class='bx bx-skip-previous' style="font-size: 55px;"></i></button>
+      <button id="prev"><i class='bx bx-skip-previous' style="font-size: 32px;"></i></button>
       <button id="play">◀▶</button>
-      <button id="next"><i class='bx bx-skip-next' style="font-size: 55px;"></i></button>
+      <button id="next"><i class='bx bx-skip-next' style="font-size: 32px;"></i></button>
     </div>
     <div>
     <input type="range" id="seek" min="0" value="0" step="0.1">
     </div>
     <div class="lyrics" id="lyrics"></div>
     <div class="playlist">
-    <h3 style="margin-top: 20px; margin-left: 20px; font-size: 32px;">Playlist</h3>
+    <h4 style="margin-top: 20px; margin-left: 20px; font-size: 25px;">Playlist</h4>
     <ul id="playlist"></ul>
     </div>
     <audio id="audio"></audio>
@@ -73,10 +73,10 @@
             <h3>And I am a <span class="text"></span></h3>
             <p>I am a student 😎</p> <!-- perbaiki teks ke bahasa Inggris -->
             <div class="home-sci">
-                <a href="https://www.instagram.com/axis_pp_ra?igsh=YjI4OWQ5aXV0YnVy" style="--i:7"><i class='bx bxl-instagram' style="font-size:40px;"></i></box-icon></a>
-                <a href="https://wa.me/+6289508883568" style="--i:8"><i class='bx bxl-whatsapp' style="font-size:40px;"></i></box-icon ></a>
-                <a href="https://www.tiktok.com/@axis_pp_ra" style="--i:9"><i class='bx bxl-tiktok' style="font-size:40px;"></i></box-icon></a>
-                <a href="https://github.com/Ajiskeren" style="--i:10"><i class='bx bxl-github' style="font-size:40px;"></i></box-icon></a>
+                <a href="https://www.instagram.com/axis_pp_ra?igsh=YjI4OWQ5aXV0YnVy" style="--i:7"><i class='bx bxl-instagram' style="font-size: 12px;"></i></box-icon></a>
+                <a href="https://wa.me/+6289508883568" style="--i:8"><i class='bx bxl-whatsapp' style="font-size:12px;"></i></box-icon ></a>
+                <a href="https://www.tiktok.com/@axis_pp_ra" style="--i:9"><i class='bx bxl-tiktok' style="font-size:12px;"></i></box-icon></a>
+                <a href="https://github.com/Ajiskeren" style="--i:10"><i class='bx bxl-github' style="font-size:12px;"></i></box-icon></a>
             </div>
             <a href="#contact" class="btn-box1">Contact Me</a>
         </div>
@@ -84,12 +84,12 @@
     </section>
         <div class="about-text">
             <h2 data-aos="fade-right" data-aos-duration="1000" >About<span>Me</span></h2>
-            <h4 data-aos="fade-left" data-aos-duration="1000">M. Aziz Jaya</h4>
+            <h3 data-aos="fade-left" data-aos-duration="1000">M. Aziz Jaya</h4>
         </div>
     <section class="about" id="about">
         <div class="about-intro">
         </div>
-        <div data-aos="fade-up" data-aos-duration="1000" class="about-text">
+        <div data-aos="fade-right" data-aos-duration="1000" class="about-text">
         <p id="text">
             Hi! My name is M. Aziz Jaya (call me Ajis), a 15-year-old student from Bagelen 1, Pesawaran, Lampung. I’m passionate about coding, design, and technology, with skills in HTML, CSS, JavaScript, Python, and Node.js. I’ve created projects like music websites, portfolio sites, and WhatsApp bots, and my goal is to become a professional programmer.
   <span id="dots">...</span>
@@ -103,9 +103,9 @@
     <section>
         <div class="services" id="services">
             <div class="container">
-                <h1 class="sub-title">My <span>services</span></h1>
+                <h1 data-aos="fade-left" data-aos-duration="500" class="sub-title">My <span>services</span></h1>
                 <div class="services-list">
-                    <div data-aos="fade-right" data-aos-duration="800">
+                    <div data-aos="flip-left" data-aos-duration="800">
                         <i class='bx bx-code' style='color:#ce4dd5'  ></i>
                         <h2>UI/UX Design</h2>
                         <p>Creative designs using Canva, Photoshop, and GIMP for social media, branding, and digital content.</p>
@@ -113,37 +113,37 @@
                     </div>
                     
     
-                    <div data-aos="fade-left" data-aos-duration="800">
+                    <div data-aos="flip-left" data-aos-duration="800">
                         <i class='bx bx-crop' style='color:#ce4dd5'  ></i>
                         <h2>Graphic Design</h2>
                         <p>Modern and user-friendly interfaces that focus on smooth navigation and great user experience.</p>
                         <a href="#contact" class="read">Contact me</a>
                     </div>
-                    <div data-aos="fade-right" data-aos-duration="800">
+                    <div data-aos="flip-left" data-aos-duration="800">
                         <i class='bx bxl-visual-studio' style='color:#ce4dd5'></i>
                         <h2>Web Development</h2>
                         <p>Responsive websites built with HTML, CSS, and JavaScript, plus basic Node.js and Python features.</p>
                         <a href="#contact" class="read">Contact me</a>
                     </div>
-                    <div data-aos="fade-left" data-aos-duration="800">
+                    <div data-aos="flip-left" data-aos-duration="800">
                         <i class='bx bxl-whatsapp' style='color:#ce4dd5'></i>
                         <h2>WhatsApp Bot Development</h2>
                         <p>Custom WhatsApp bots for group management, automation, and practical tools.</p>
                         <a href="#contact" class="read">Contact me</a>
                     </div>
-                    <div data-aos="fade-right" data-aos-duration="800">
+                    <div data-aos="flip-left" data-aos-duration="800">
                         <i class='bx bx-rocket' style='color:#ce4dd5'></i>
                         <h2>Automation Tools</h2>
                         <p>Simple automation scripts with Python and Node.js to save time and reduce repetitive work.</p>
                         <a href="#contact" class="read">Contact me</a>
                     </div>
-                    <div data-aos="fade-left" data-aos-duration="800">
+                    <div data-aos="flip-left" data-aos-duration="800">
                         <i class='bx bx-cloud-upload' style='color:#ce4dd5'></i>
                         <h2>Website Maintenance</h2>
                         <p>Regular updates, performance optimization, and bug fixing to keep websites secure and reliable.</p>
                         <a href="#contact" class="read">Contact me</a>
                     </div>
-                    <div data-aos="fade-right" data-aos-duration="800">
+                    <div data-aos="flip-left" data-aos-duration="800">
                         <i class='bx bx-video' style='color:#ce4dd5'></i>
                         <h2>Content Creation Support</h2>
                         <p>Visuals and design elements that align with brand identity and enhance digital content.</p>
@@ -154,11 +154,11 @@
             </div>
         </div>
     </section> 
-    <h1 class="sub-title">My <span>Skills</span></h1>
+    <h1 data-aos="fade-right" data-aos-duration="500" class="sub-title">My <span >Skills</span></h1>
     <section>
       
         <div class="container1" id="skills">
-                <h1 class="heading1">Technical Skills</h1>
+                <h1 data-aos="fade-right" data-aos-duration="1000" class="heading1">Technical Skills</h1>
             <div class="Technical-bars">
             
                 <div class="bar"><i style="color: #c95d2e" class='bx bxl-html5'></i>
@@ -198,8 +198,8 @@
     
     
         <div class="container2">
-            <h1 class="heading2">Profesional Skills</h1>
-            <div class="radial-bars">
+            <h1 data-aos="fade-right" data-aos-duration="500" class="heading2">Profesional Skills</h1>
+            <div data-aos="zoom-in" data-aos-duration="500" class="radial-bars">
 
                 <div class="radial-bar">
                     <svg x="0px" y="0px" viewBox="0 0 200 200">
@@ -243,13 +243,12 @@
 
     <section class="contact" id="contact">
         <div class="contact-text">
-            <h2>Contact <span>Me</span></h2>
-            <h4>Wanna Make Something Cool?</h4>
-            <p>Hey! Stoked you’re here checking out my portfolio 😎
-Got a cool idea, a question, or just wanna team up on something awesome? Drop me a message through this form and let’s make it happen. I promise I’ll hit you back ASAP!</p>
+            <h2 data-aos="fade-right" data-aos-duration="300" >Contact <span>Me</span></h2>
+            <h4 data-aos="fade-right" data-aos-duration="600" >Wanna Make Something Cool?</h4>
+            <p id="typing" ></p>
             <ul class="contact-list">
-                <li><i class="bx bxs-send"></i> ezdek1231@gmail.com</li>
-                <li><i class="bx bxs-phone"></i> 089508883568</li>
+                <li data-aos="zoom-in" data-aos-duration="500" ><i data-aos="fade-right" data-aos-duration="500" class="bx bxs-send"></i> ezdek1231@gmail.com</li>
+                <li data-aos="zoom-in" data-aos-duration="500" ><i data-aos="fade-right" data-aos-duration="500" class="bx bxs-phone"></i> 089508883568</li>
             </ul>
         </div>
     
@@ -257,18 +256,16 @@ Got a cool idea, a question, or just wanna team up on something awesome? Drop me
 
 <div class="contact-form">
   <form id="contactForm">
-    <input type="text" name="from_name" placeholder="Enter Your Name" required>
-    <input type="email" name="reply_to" placeholder="Enter Your Email" required>
-    <input type="text" name="subject" placeholder="Enter Your Subject">
-    <textarea name="message" placeholder="Enter Your Message" required></textarea>
-    <button class="send" type="submit">Submit</button>
+    <input data-aos="fade-right" data-aos-duration="300" type="text" name="from_name" placeholder="Enter Your Name" required>
+    <textarea data-aos="fade-right" data-aos-duration="600" name="message" placeholder="Enter Your Message" required></textarea>
+    <button data-aos="fade-right" data-aos-duration="800" class="send" type="submit">Submit</button>
   </form>
 </div>
 
         <div class="contact-icons">
-            <a data-aos="flip-left" data-aos-duration="2000" href="https://www.instagram.com/axis_pp_ra?igsh=YjI4OWQ5aXV0YnVy"><i class="bx bxl-instagram"></i></a>
-            <a data-aos="flip-left" data-aos-duration="2000" href="https://wa.me/+6289508883568"><i class="bx bxl-whatsapp"></i></a>
-            <a data-aos="flip-left" data-aos-duration="2000" href="https://www.tiktok.com/@axis_pp_ra"><i class="bx bxl-tiktok"></i></a>
+            <a data-aos="flip-left" data-aos-duration="500" href="https://www.instagram.com/axis_pp_ra?igsh=YjI4OWQ5aXV0YnVy"><i class="bx bxl-instagram"></i></a>
+            <a data-aos="flip-left" data-aos-duration="1000" href="https://wa.me/+6289508883568"><i class="bx bxl-whatsapp"></i></a>
+            <a data-aos="flip-left" data-aos-duration="1500" href="https://www.tiktok.com/@axis_pp_ra"><i class="bx bxl-tiktok"></i></a>
             <a data-aos="flip-left" data-aos-duration="2000" href="https://github.com/Ajiskeren"><i class="bx bxl-github"></i></a>
         </div>
     <div class="last-text">
@@ -287,9 +284,7 @@ Got a cool idea, a question, or just wanna team up on something awesome? Drop me
     <span id="minutes">00</span>
     <span id="seconds">00</span>
   </div>
-  <div class="Btnss">
   <button id="closeBtn"><i class='bx bxs-right-arrow-alt toggle-btnST'></i></button>
-  </div>
 <div class="sidebar-widget weather-widget">
   <div id="weather" class="weather-horizontal">Memuat...</div>
 </div>

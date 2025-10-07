@@ -50,7 +50,7 @@ let x = 100;  // posisi awal X
 let y = 100;  // posisi awal Y
 let dx = 2;   // kecepatan arah X
 let dy = 2;   // kecepatan arah Y
-const speed = 2;
+const speed = 1;
 
 function moveButton() {
   const btnWidth = toggleBtn.offsetWidth;
@@ -353,7 +353,7 @@ function updateLyrics(currentTime) {
     if (active) {
       active.classList.add("active");
       lyricsEl.scrollTo({
-        top: active.offsetTop - lyricsEl.clientHeight / 0.27,
+        top: active.offsetTop - lyricsEl.clientHeight / 0.345,
         behavior: "smooth"
       });
     }
@@ -554,3 +554,87 @@ function tampilkanTanggal() {
 
 // Jalankan saat halaman dimuat
 tampilkanTanggal();
+
+const bars = document.querySelectorAll('.bar');
+const radialBars = document.querySelectorAll('.radial-bar');
+
+// --- Untuk animasi bar horizontal ---
+function checkVisibleBars() {
+  bars.forEach(bar => {
+    const rect = bar.getBoundingClientRect();
+    const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+
+    if (isVisible) {
+      bar.classList.add('active');
+    } else {
+      bar.classList.remove('active');
+    }
+  });
+}
+
+// --- Untuk animasi radial bar ---
+function checkVisibleRadialBars() {
+  radialBars.forEach(bar => {
+    const rect = bar.getBoundingClientRect();
+    const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+
+    if (isVisible) {
+      bar.classList.add('active');
+    } else {
+      bar.classList.remove('active');
+    }
+  });
+}
+
+// Gabungkan event scroll & load untuk keduanya
+window.addEventListener('scroll', () => {
+  checkVisibleBars();
+  checkVisibleRadialBars();
+});
+window.addEventListener('load', () => {
+  checkVisibleBars();
+  checkVisibleRadialBars();
+});
+
+const text = `Hey! Stoked you’re here checking out my portfolio 😎
+Got a cool idea, a question, or just wanna team up on something awesome?
+Drop me a message through this form and let’s make it happen.
+I promise I’ll hit you back ASAP!`;
+
+const typingEl = document.getElementById("typing");
+let index = 0;
+let isTyping = false;
+
+// Ubah ini sesuai kata yang ingin dijadikan titik mulai animasi:
+const startWord = "Got"; 
+const startIndex = text.indexOf(startWord);
+
+// Bagian sebelum kata "Drop" langsung tampil
+const staticText = text.slice(0, startIndex);
+
+function typeEffect() {
+  if (index < text.length) {
+    typingEl.textContent += text.charAt(index);
+    index++;
+    setTimeout(typeEffect, 35);
+  } else {
+    isTyping = false;
+  }
+}
+
+const typingObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && !isTyping) {
+      isTyping = true;
+
+      // tampilkan bagian awal
+      typingEl.textContent = staticText;
+
+      // mulai efek mengetik dari kata "Drop"
+      index = startIndex;
+      typeEffect();
+    }
+  });
+}, { threshold: 0.4 });
+
+typingObserver.observe(typingEl);
