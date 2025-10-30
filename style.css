@@ -13,6 +13,7 @@ html {
 body {
     color: #ededed;
     background: #081b29;
+    overflow-x: hidden;
 }
 
 
@@ -27,7 +28,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 100;
+    z-index: 0;
 }
 
 #swipe-area {
@@ -89,7 +90,7 @@ header {
   border: 1px solid gray;
   padding: 10px 2dvh 10px 10px;
   transition: 0.6s;
-  z-index: 5;
+  z-index: 9;
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
   scrollbar-width: none;
@@ -122,7 +123,7 @@ header {
     display: flex;
     justify-content: space-evenly;
     width: 65%;
-    z-index: 7;
+    z-index: 0;
 }
 
 .navbar a {
@@ -1162,4 +1163,12 @@ z-index: 1;
 
 @keyframes blink {
   50% { border-color: transparent; }
+}
+
+.tigad {
+    width: 50%;
+}
+
+.tigadd {
+    width: 100%;
 }
