@@ -1,31 +1,32 @@
 var typed = new Typed(".text", {
-    strings: ["Axis", "Beginnner", "Rey Ace"],
-    typeSpeed: 100,
-    backSpeed: 100,
-    backDelay: 1000,
-    loop: true
+  strings: ["Axis", "Beginnner", "Rey Ace"],
+  typeSpeed: 100,
+  backSpeed: 100,
+  backDelay: 1000,
+  loop: true,
 });
-
 
 // Ambil tombol scroll-up dan section home
 const scrollBtn = document.getElementById("scrollUpBtn");
 const homeSection = document.getElementById("home");
 
 // Observer untuk cek apakah section home terlihat
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      // Kalau home terlihat, sembunyikan tombol
-      scrollBtn.classList.add("hidden");
-    } else {
-      // Kalau bukan home, tampilkan tombol
-      scrollBtn.classList.remove("hidden");
-    }
-  });
-}, { threshold: 0.6 }); // 60% home terlihat baru dianggap aktif
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        // Kalau home terlihat, sembunyikan tombol
+        scrollBtn.classList.add("hidden");
+      } else {
+        // Kalau bukan home, tampilkan tombol
+        scrollBtn.classList.remove("hidden");
+      }
+    });
+  },
+  { threshold: 0.6 }
+); // 60% home terlihat baru dianggap aktif
 
 observer.observe(homeSection);
-
 
 function readMore() {
   let dots = document.getElementById("dots");
@@ -46,10 +47,10 @@ function readMore() {
 const sidebar = document.getElementById("sidebar");
 const toggleBtn = document.getElementById("toggleBtn");
 
-let x = 100;  // posisi awal X
-let y = 100;  // posisi awal Y
-let dx = 2;   // kecepatan arah X
-let dy = 2;   // kecepatan arah Y
+let x = 100; // posisi awal X
+let y = 100; // posisi awal Y
+let dx = 2; // kecepatan arah X
+let dy = 2; // kecepatan arah Y
 const speed = 1;
 
 function moveButton() {
@@ -81,8 +82,6 @@ function moveButton() {
 
 // Mulai animasi
 moveButton();
-
-
 
 // Fungsi buka/tutup
 function openSidebar() {
@@ -140,8 +139,6 @@ swipeArea.addEventListener("touchend", (e) => {
   if (diffX > 80) sidebar.classList.add("open");
 });
 
-
-
 const audio = document.getElementById("audio");
 const playBtn = document.getElementById("play");
 const prevBtn = document.getElementById("prev");
@@ -150,6 +147,7 @@ const seek = document.getElementById("seek");
 const cover = document.getElementById("cover");
 const coverImg = document.getElementById("coverImg");
 const coverMain = document.getElementById("coverMain");
+const videoCover = document.getElementById("videoCover");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
 const playlistEl = document.getElementById("playlist");
@@ -157,50 +155,13 @@ const canvas = document.getElementById("spectrum");
 const ctx = canvas.getContext("2d");
 const current = document.getElementById("current");
 const duration = document.getElementById("duration");
-let showOmori = false;
-const customImage = "Omori-Normal.gif";
+let fadeDuration = 5; // 5 detik fade
+let isFading = false;
+const circleCanvas = document.getElementById("circleCanvas");
+const ctx2 = circleCanvas.getContext("2d");
 
-let currentTrack = 0;
-
-// Daftar lagu
-const tracks = [
-  { title: "Fall in Love Alone", artist: "Stacey Ryan", src: "assets/lagu1.mp3", cover: "assets/cover1.jpg", video: "assets/cover1.mp4" },
-  { title: "One The Way", artist: "AiNa The End", src: "assets/lagu2.mp3", cover: "assets/cover2.jpg" },
-  { title: "Best Friends", artist: "Rex Orange", src: "assets/lagu3.mp3", cover: "assets/cover3.jpg" },
-  { title: "Line Without hook", artist: "Rick Montogeomery", src: "assets/lagu4.mp3", cover: "assets/cover4.jpg" },
-  { title: "Every summertime", artist: "NIKI", src: "assets/lagu5.mp3", cover: "assets/cover5.jpg" },
-  { title: "Blue", artist: "Yung Kai", src: "assets/lagu6.mp3", cover: "assets/cover6.jpg" },
-  { title: "Double Take", artist: "Druv", src: "assets/lagu7.mp3", cover: "assets/cover7.jpg" },
-  { title: "Dandelions", artist: "Ruth B.", src: "assets/lagu8.mp3", cover: "assets/cover8.jpg" },
-  { title: "Two Birds", artist: "Regina Spektor", src: "assets/lagu9.mp3", cover: "assets/cover9.jpg" },
-  { title: "Devil Disguise", artist: "Marino", src: "assets/lagu10.mp3", cover: "assets/cover10.jpg" },
-  { title: "December", artist: "Neck Deep", src: "assets/lagu11.mp3", cover: "assets/cover11.jpg" }
-];
-
-// fungsi ganti cover dengan transisi
-function setCover(src) {
-  coverMain.style.opacity = 0; // mulai fade out
-  setTimeout(() => {
-    coverMain.src = src;       // ganti gambar
-    coverMain.style.opacity = 1; // fade in
-  }, 500);
-}
-
-// fungsi toggle Omori <-> cover lagu
-function toggleCover() {
-  if (showOmori) {
-    setCover(tracks[currentTrack].cover);
-  } else {
-    setCover(customImage);
-  }
-  showOmori = !showOmori;
-}
-
-// otomatis ganti tiap 5 detik
-setInterval(toggleCover, 5000);
-
-// bisa juga ganti manual kalau diklik
-coverMain.addEventListener("click", toggleCover);
+let currentTrack = 0; // hanya 1 deklarasi di file
+let showVideo = false; // akan di-set pada loadTrack
 
 // Render playlist
 tracks.forEach((track, i) => {
@@ -210,24 +171,6 @@ tracks.forEach((track, i) => {
   playlistEl.appendChild(li);
 });
 
-// Load track
-function loadTrack(index) {
-  currentTrack = index;
-  const track = tracks[currentTrack];
-  audio.src = track.src;
-  cover.src = track.cover;
-  coverImg.src = track.cover;
-  coverMain.src = track.cover;
-  title.textContent = track.title;
-  artist.textContent = track.artist;
-  
-  handleLyrics(track.src);
-
-  highlightPlaylist();
-  audio.play();
-  playBtn.textContent = "ツ";
-}
-
 // Highlight playlist
 function highlightPlaylist() {
   [...playlistEl.children].forEach((el, i) => {
@@ -235,9 +178,142 @@ function highlightPlaylist() {
   });
 }
 
+function waitForEventOnce(target, eventName, timeoutMs = 2500) {
+  return new Promise((resolve, reject) => {
+    let done = false;
+    function cleanup() {
+      done = true;
+      target.removeEventListener(eventName, onEvent);
+      clearTimeout(timer);
+    }
+    function onEvent(e) {
+      if (done) return;
+      cleanup();
+      resolve(e);
+    }
+    target.addEventListener(eventName, onEvent);
+    const timer = setTimeout(() => {
+      if (done) return;
+      cleanup();
+      reject(new Error("timeout " + eventName));
+    }, timeoutMs);
+  });
+}
+
+// ======= tampilkan video dengan transisi aman
+async function showVideoCover() {
+  if (!videoCover) return;
+  // load / ensure ready
+  try {
+    videoCover.load();
+    await waitForEventOnce(videoCover, "canplay", 2500).catch(() => null);
+    await videoCover.play().catch((e) => console.warn("play rejected:", e));
+  } catch (e) {
+    console.warn("showVideoCover err", e);
+  }
+  videoCover.classList.add("visible");
+  cover.classList.add("hidden");
+}
+
+// ======= tampilkan image
+function showImageCover() {
+  if (!videoCover) return;
+  videoCover.classList.remove("visible");
+  cover.classList.remove("hidden");
+  try {
+    videoCover.pause();
+  } catch (e) {}
+}
+
+// ======= toggle click pada container .cover
+document.querySelector(".cover").addEventListener("click", () => {
+  const t = tracks[currentTrack];
+  if (!t || !t.videoCover) return;
+  showVideo = !showVideo;
+  if (showVideo) showVideoCover();
+  else showImageCover();
+});
+
+function fadeOut(audio, duration = fadeDuration) {
+  isFading = true;
+  let step = audio.volume / (duration * 20); // 20 kali per detik
+
+  const fade = setInterval(() => {
+    if (audio.volume - step > 0) {
+      audio.volume -= step;
+    } else {
+      audio.volume = 0;
+      clearInterval(fade);
+    }
+  }, 50);
+}
+
+function fadeIn(audio, duration = fadeDuration) {
+  audio.volume = 0;
+  let step = 1 / (duration * 20);
+
+  const fade = setInterval(() => {
+    if (audio.volume + step < 1) {
+      audio.volume += step;
+    } else {
+      audio.volume = 1;
+      clearInterval(fade);
+    }
+  }, 50);
+}
+
+// ======= loadTrack (panggil ini saat memilih lagu)
+function loadTrack(index) {
+  currentTrack = index;
+  const track = tracks[currentTrack];
+  if (!track) return;
+
+  isFading = false; // reset
+
+  // set audio & text
+  audio.src = track.src;
+  title.textContent = track.title || "";
+  artist.textContent = track.artist || "";
+
+  // set image
+  cover.src = track.cover || "";
+  coverImg.src = track.cover || "";
+
+  cover.src = track.cover || "";
+  coverMain.src = track.cover || "";
+
+  // set video jika ada
+  if (track.videoCover) {
+    if (videoCover.getAttribute("src") !== track.videoCover) {
+      videoCover.setAttribute("src", track.videoCover);
+      try {
+        videoCover.load();
+      } catch (e) {}
+    }
+
+    showVideo = true;
+    showVideoCover();
+  } else {
+    showVideo = false;
+    showImageCover();
+  }
+
+  // load lirik
+  handleLyrics(track.src);
+
+  // highlight playlist + autoplay
+  highlightPlaylist();
+
+  audio.play().catch((e) => console.warn("audio play:", e));
+  playBtn.textContent = "ツ";
+
+  // 🔥 Fade in saat lagu baru mulai
+  fadeIn(audio);
+}
+
 // Play/Pause
 playBtn.addEventListener("click", () => {
-  if(audio.paused) {
+  if (audio.paused) {
     audio.play();
     playBtn.textContent = "ツ";
   } else {
@@ -266,10 +342,36 @@ audio.addEventListener("ended", () => {
 audio.addEventListener("timeupdate", () => {
   seek.value = audio.currentTime;
   seek.max = audio.duration;
+
+  updateSliderColor();
 });
 seek.addEventListener("input", () => {
   audio.currentTime = seek.value;
+
+  updateSliderColor();
 });
+
+audio.addEventListener("timeupdate", () => {
+  if (!audio.duration) return;
+
+  if (!isFading && audio.duration - audio.currentTime <= fadeDuration) {
+    fadeOut(audio);
+  }
+});
+
+// === Update warna progress slider ===
+function updateSliderColor() {
+  if (!seek.max || seek.max == 0) return;
+
+  const value = (seek.value / seek.max) * 100;
+
+  // Warna progress smooth
+  seek.style.background = `
+    linear-gradient(90deg, 
+      #4facfe ${value}%, 
+      #d0d0d0 ${value}%)
+  `;
+}
 
 // Saat pertama kali masuk, pilih lagu random & auto play
 window.addEventListener("load", () => {
@@ -280,23 +382,23 @@ window.addEventListener("load", () => {
 // ========================
 // LIRIK SYNC FUNCTION
 // ========================
-let lrcData = [];           // simpan lirik sinkron
-let lastActiveIndex = -1;   // track baris aktif terakhir
+let lrcData = []; // simpan lirik sinkron
+let lastActiveIndex = -1; // track baris aktif terakhir
 const lyricsEl = document.getElementById("lyrics");
 
 // Fungsi utama: load lirik dari file .lrc
 function handleLyrics(trackSrc) {
   const lrcFile = trackSrc.replace(".mp3", ".lrc");
   fetch(lrcFile)
-    .then(res => {
+    .then((res) => {
       if (!res.ok) throw new Error("File LRC tidak ditemukan: " + lrcFile);
       return res.text();
     })
-    .then(text => {
+    .then((text) => {
       lrcData = parseLRC(text);
       renderLyrics(lrcData);
     })
-    .catch(err => {
+    .catch((err) => {
       console.warn("Tidak ada lirik:", err);
       lrcData = [];
       renderLyrics(lrcData);
@@ -353,8 +455,8 @@ function updateLyrics(currentTime) {
     if (active) {
       active.classList.add("active");
       lyricsEl.scrollTo({
-        top: active.offsetTop - lyricsEl.clientHeight / 0.345,
-        behavior: "smooth"
+        top: active.offsetTop - lyricsEl.clientHeight / 0.27,
+        behavior: "smooth",
       });
     }
     lastActiveIndex = idx;
@@ -366,84 +468,200 @@ audio.addEventListener("timeupdate", () => {
   updateLyrics(audio.currentTime);
 });
 
-canvas.width = window.innerWidth;
-  canvas.height = 200;
+function resizeCanvas() {
+  const styleWidth = canvas.clientWidth;
+  const styleHeight = canvas.clientHeight;
+  const dpi = window.devicePixelRatio || 1;
 
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const analyser = audioCtx.createAnalyser();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  canvas.width = styleWidth * dpi;
+  canvas.height = styleHeight * dpi;
+  ctx.scale(dpi, dpi);
+}
 
-  analyser.fftSize = 2048; // resolusi detail
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-  const source = audioCtx.createMediaElementSource(audio);
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
+// --- AUDIO ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const analyser = audioCtx.createAnalyser();
 
-  const barCount = 40; // bar besar
-  const smoothed = new Float32Array(barCount);
+analyser.fftSize = 2048;
+const bufferLength = analyser.fftSize;
+const dataArray = new Uint8Array(bufferLength);
 
-  function draw() {
-    requestAnimationFrame(draw);
-    analyser.getByteFrequencyData(dataArray);
+const source = audioCtx.createMediaElementSource(audio);
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+// --- DRAW ---
+function draw() {
+  requestAnimationFrame(draw);
 
-    const barWidth = canvas.width / barCount;
+  analyser.getByteTimeDomainData(dataArray);
 
-    for (let i = 0; i < barCount; i++) {
-      const percent = i / barCount;
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  const center = h / 2;
 
-      // log scale index
-      const index = Math.floor(Math.pow(percent, 2.0) * bufferLength); 
-      let value = dataArray[index] || 0;
+  ctx.clearRect(0, 0, w, h);
 
-      // boost high frequency (kanan)
-      const boost = 1 + percent * 2; // makin ke kanan makin naik
-      value *= boost;
+  // smoothing buffer (biar gelombang halus)
+  if (!window.smoothWave) {
+    window.smoothWave = new Float32Array(bufferLength);
+  }
 
-      // smoothing
-      smoothed[i] = smoothed[i] * 0.85 + value * 0.15;
+  // smoothing 90% old + 10% new
+  for (let i = 0; i < bufferLength; i++) {
+    const target = (dataArray[i] - 128) / 128; // normal -1 sampai 1
+    window.smoothWave[i] = window.smoothWave[i] * 0.9 + target * 0.1;
+  }
 
-      // scaling
-      let barHeight = smoothed[i] * 0.5;
+  // gambar waveform
+  ctx.strokeStyle = "#00ffcc";
+  ctx.lineWidth = 2;
 
-      // biar gak hilang total
-      if (barHeight < 10) barHeight = 10;
+  ctx.beginPath();
 
-      ctx.fillStyle = "#00ffcc";
-      ctx.fillRect(
-        i * barWidth,
-        canvas.height - barHeight,
-        barWidth - 4,
-        barHeight
-      );
+  const slice = w / bufferLength;
+
+  for (let i = 0; i < bufferLength; i++) {
+    const y = center + window.smoothWave[i] * (h * 0.45);
+    const x = i * slice;
+
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+
+  ctx.stroke();
+}
+
+function resizeCircleCanvas() {
+  const dpi = window.devicePixelRatio || 1;
+  const w = circleCanvas.clientWidth;
+  const h = circleCanvas.clientHeight;
+
+  circleCanvas.width = w * dpi;
+  circleCanvas.height = h * dpi;
+
+  ctx2.setTransform(1, 0, 0, 1, 0, 0);
+  ctx2.scale(dpi, dpi);
+}
+
+resizeCircleCanvas();
+window.addEventListener("resize", resizeCircleCanvas);
+
+// ------ GUNAKAN AUDIOCTX YANG SAMA SELALU ------
+const analyserCircle = audioCtx.createAnalyser();
+analyserCircle.fftSize = 256;
+
+const bufferCircle = analyserCircle.frequencyBinCount;
+const dataCircle = new Uint8Array(bufferCircle);
+
+// 1x saja: source audio untuk semua analis
+source.connect(analyserCircle);
+source.connect(analyser); // yang waveform
+analyserCircle.connect(audioCtx.destination);
+
+// ------ DRAW CIRCLE ------
+function drawCircleSpectrum() {
+  requestAnimationFrame(drawCircleSpectrum);
+
+  analyserCircle.getByteTimeDomainData(dataCircle);
+
+  const w = circleCanvas.clientWidth;
+  const h = circleCanvas.clientHeight;
+
+  const imgW = 110; // ukuran gambar kamu
+  const imgH = 110;
+  const cornerRadius = imgW * 0.2; // 20%
+
+  const expand = 55; // seberapa jauh spektrum menjauh dari gambar
+
+  ctx2.clearRect(0, 0, w, h);
+  ctx2.save();
+
+  ctx2.translate(w / 2, h / 2);
+
+  ctx2.beginPath();
+
+  const total = dataCircle.length;
+
+  for (let i = 0; i < total; i++) {
+    const v = (dataCircle[i] - 128) / 128;
+    const wave = v * expand;
+
+    const t = i / total;
+
+    // PATH keliling rounded-rectangle
+    let x, y;
+
+    if (t < 0.25) {
+      // top edge
+      const pct = t / 0.25;
+      x = -imgW / 2 + cornerRadius + pct * (imgW - 2 * cornerRadius);
+      y = -imgH / 2 - wave;
+    } else if (t < 0.5) {
+      // right edge
+      const pct = (t - 0.25) / 0.25;
+      x = imgW / 2 + wave;
+      y = -imgH / 2 + cornerRadius + pct * (imgH - 2 * cornerRadius);
+    } else if (t < 0.75) {
+      // bottom edge
+      const pct = (t - 0.5) / 0.25;
+      x = imgW / 2 - cornerRadius - pct * (imgW - 2 * cornerRadius);
+      y = imgH / 2 + wave;
+    } else {
+      // left edge
+      const pct = (t - 0.75) / 0.25;
+      x = -imgW / 2 - wave;
+      y = imgH / 2 - cornerRadius - pct * (imgH - 2 * cornerRadius);
     }
+
+    if (i === 0) ctx2.moveTo(x, y);
+    else ctx2.lineTo(x, y);
   }
 
-  audio.onplay = () => {
-    audioCtx.resume().then(draw);
-  };
+  ctx2.closePath();
 
-  // format detik -> menit:detik
-  function formatTime(sec) {
-    if (isNaN(sec)) return "0:00";
-    const m = Math.floor(sec / 60);
-    const s = Math.floor(sec % 60);
-    return `${m}:${s < 10 ? "0" + s : s}`;
+  // neon
+  ctx2.strokeStyle = "#c300ff";
+  ctx2.lineWidth = 3;
+  ctx2.shadowBlur = 20;
+  ctx2.shadowColor = "#ff00ff";
+
+  ctx2.stroke();
+
+  ctx2.restore();
+}
+
+audio.onplay = async () => {
+  if (audioCtx.state === "suspended") {
+    await audioCtx.resume();
   }
+  draw(); // menjalankan waveform
+  drawCircleSpectrum(); // menjalankan spectrum lingkaran
+};
 
-  // update total durasi setelah metadata siap
-  audio.addEventListener("loadedmetadata", () => {
-    duration.textContent = formatTime(audio.duration);
-  });
+// format detik -> menit:detik
+function formatTime(sec) {
+  if (isNaN(sec)) return "0:00";
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s < 10 ? "0" + s : s}`;
+}
 
-  // update current time selama audio play
-  audio.addEventListener("timeupdate", () => {
-    current.textContent = formatTime(audio.currentTime);
-  });
+// update total durasi setelah metadata siap
+audio.addEventListener("loadedmetadata", () => {
+  duration.textContent = formatTime(audio.duration);
+});
 
-  // Toggle Sidebar
+// update current time selama audio play
+audio.addEventListener("timeupdate", () => {
+  current.textContent = formatTime(audio.currentTime);
+});
+
+// Toggle Sidebar
 const sidebarS = document.getElementById("sidebarS");
 const openBtn = document.getElementById("openBtn");
 const closeBtn = document.getElementById("closeBtn");
@@ -462,9 +680,15 @@ closeBtn.addEventListener("click", () => {
 
 function updateTime() {
   const now = new Date();
-  document.getElementById('hours').textContent = String(now.getHours()).padStart(2, '0');
-  document.getElementById('minutes').textContent = String(now.getMinutes()).padStart(2, '0');
-  document.getElementById('seconds').textContent = String(now.getSeconds()).padStart(2, '0');
+  document.getElementById("hours").textContent = String(
+    now.getHours()
+  ).padStart(2, "0");
+  document.getElementById("minutes").textContent = String(
+    now.getMinutes()
+  ).padStart(2, "0");
+  document.getElementById("seconds").textContent = String(
+    now.getSeconds()
+  ).padStart(2, "0");
 }
 setInterval(updateTime, 1000);
 updateTime();
@@ -474,23 +698,23 @@ async function getWeather(city) {
 
   // Lebih banyak emoji
   const weatherIcons = {
-    "sunny": "☀️🌞🔥",
-    "clear": "🌞✨🌙",
-    "cloud": "☁️🌥️🌤️",
-    "partly": "⛅🌤️🌥️",
-    "overcast": "🌥️☁️🌫️",
-    "rain": "🌧️🌦️💧",
-    "shower": "🌦️🌧️☔",
-    "thunder": "⛈️⚡🌩️",
-    "storm": "🌪️🌩️⛈️",
-    "drizzle": "💧🌦️☁️",
-    "mist": "🌫️🌁💨",
-    "fog": "🌫️🌁👓",
-    "snow": "❄️☃️⛄",
-    "ice": "🧊❄️🥶",
-    "wind": "💨🍃🌬️",
-    "hot": "🔥🥵🌞",
-    "cold": "🥶❄️🧊"
+    sunny: "☀️🌞🔥",
+    clear: "🌞✨🌙",
+    cloud: "☁️🌥️🌤️",
+    partly: "⛅🌤️🌥️",
+    overcast: "🌥️☁️🌫️",
+    rain: "🌧️🌦️💧",
+    shower: "🌦️🌧️☔",
+    thunder: "⛈️⚡🌩️",
+    storm: "🌪️🌩️⛈️",
+    drizzle: "💧🌦️☁️",
+    mist: "🌫️🌁💨",
+    fog: "🌫️🌁👓",
+    snow: "❄️☃️⛄",
+    ice: "🧊❄️🥶",
+    wind: "💨🍃🌬️",
+    hot: "🔥🥵🌞",
+    cold: "🥶❄️🧊",
   };
 
   try {
@@ -519,79 +743,96 @@ getWeather("Bagelen+Pesawaran");
 // Auto-refresh tiap 10 menit
 setInterval(() => getWeather("Bagelen+Pesawaran"), 600000);
 
-(function(){
+(function () {
   emailjs.init("vusiDp2YuSkT0-mcC"); // Public Key dari EmailJS
 })();
 
-document.addEventListener("DOMContentLoaded", function() {
-  document.getElementById("contactForm").addEventListener("submit", function(e){
-    e.preventDefault();
+document.addEventListener("DOMContentLoaded", function () {
+  document
+    .getElementById("contactForm")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
 
-    emailjs.sendForm("service_2fde5xv", "template_jj81348", this)
-      .then(function(){
-        alert("✅ Pesan berhasil dikirim!");
-      }, function(error){
-        alert("❌ Gagal: " + JSON.stringify(error));
-      });
-  });
+      emailjs.sendForm("service_2fde5xv", "template_jj81348", this).then(
+        function () {
+          alert("✅ Pesan berhasil dikirim!");
+        },
+        function (error) {
+          alert("❌ Gagal: " + JSON.stringify(error));
+        }
+      );
+    });
 });
 
 function tampilkanTanggal() {
   const sekarang = new Date();
 
-  const hari = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
-  const bulan = ["Januari","Februari","Maret","April","Mei","Juni",
-                 "Juli","Agustus","September","Oktober","November","Desember"];
+  const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+  const bulan = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
 
   const namaHari = hari[sekarang.getDay()];
   const tanggal = sekarang.getDate();
   const namaBulan = bulan[sekarang.getMonth()];
   const tahun = sekarang.getFullYear();
 
-  document.getElementById("tanggal").textContent = 
-    `${namaHari}, ${tanggal} ${namaBulan} ${tahun}`;
+  document.getElementById(
+    "tanggal"
+  ).textContent = `${namaHari}, ${tanggal} ${namaBulan} ${tahun}`;
 }
 
 // Jalankan saat halaman dimuat
 tampilkanTanggal();
 
-const bars = document.querySelectorAll('.bar');
-const radialBars = document.querySelectorAll('.radial-bar');
+const bars = document.querySelectorAll(".bar");
+const radialBars = document.querySelectorAll(".radial-bar");
 
 // --- Untuk animasi bar horizontal ---
 function checkVisibleBars() {
-  bars.forEach(bar => {
+  bars.forEach((bar) => {
     const rect = bar.getBoundingClientRect();
     const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
 
     if (isVisible) {
-      bar.classList.add('active');
+      bar.classList.add("active");
     } else {
-      bar.classList.remove('active');
+      bar.classList.remove("active");
     }
   });
 }
 
 // --- Untuk animasi radial bar ---
 function checkVisibleRadialBars() {
-  radialBars.forEach(bar => {
+  radialBars.forEach((bar) => {
     const rect = bar.getBoundingClientRect();
     const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
 
     if (isVisible) {
-      bar.classList.add('active');
+      bar.classList.add("active");
     } else {
-      bar.classList.remove('active');
+      bar.classList.remove("active");
     }
   });
 }
 
 // Gabungkan event scroll & load untuk keduanya
-window.addEventListener('scroll', () => {
+window.addEventListener("scroll", () => {
   checkVisibleBars();
   checkVisibleRadialBars();
 });
-window.addEventListener('load', () => {
+window.addEventListener("load", () => {
   checkVisibleBars();
   checkVisibleRadialBars();
 });
@@ -606,7 +847,7 @@ let index = 0;
 let isTyping = false;
 
 // Ubah ini sesuai kata yang ingin dijadikan titik mulai animasi:
-const startWord = "Got"; 
+const startWord = "Got";
 const startIndex = text.indexOf(startWord);
 
 // Bagian sebelum kata "Drop" langsung tampil
@@ -622,19 +863,22 @@ function typeEffect() {
   }
 }
 
-const typingObserver = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting && !isTyping) {
-      isTyping = true;
+const typingObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting && !isTyping) {
+        isTyping = true;
 
-      // tampilkan bagian awal
-      typingEl.textContent = staticText;
+        // tampilkan bagian awal
+        typingEl.textContent = staticText;
 
-      // mulai efek mengetik dari kata "Drop"
-      index = startIndex;
-      typeEffect();
-    }
-  });
-}, { threshold: 0.4 });
+        // mulai efek mengetik dari kata "Drop"
+        index = startIndex;
+        typeEffect();
+      }
+    });
+  },
+  { threshold: 0.4 }
+);
 
 typingObserver.observe(typingEl);

@@ -26,8 +26,9 @@
   <div class="sidebar" id="sidebar">
        <h2>ᴺᴼᵂ ᴾᴸᴬᵞᴵᴺᴳ</h2>
     <div class="cover">
-      <img id="cover" src="assets/cover1.jpg" alt="cover">
-    </div>
+    <img id="cover" class="image-cover">
+    <video id="videoCover" class="video-cover" muted loop playsinline></video>
+</div>
     <div class="Title">
     <div class="title">
     <h4 id="title">Judul Lagu</h4>
@@ -45,9 +46,9 @@
       <button id="play">◀▶</button>
       <button id="next"><i class='bx bx-skip-next' style="font-size: 32px;"></i></button>
     </div>
-    <div>
-    <input type="range" id="seek" min="0" value="0" step="0.1">
-    </div>
+<div class="slider-container">
+  <input type="range" id="seek" class="seek" min="0" value="0" step="0.1">
+</div>
     <div class="lyrics" id="lyrics"></div>
     <div class="playlist">
     <h4 style="margin-top: 20px; margin-left: 20px; font-size: 25px;">Playlist</h4>
@@ -67,7 +68,10 @@
         </nav>
     </header>
     <section class="home" id="home"> <!-- perbaiki 'Home' menjadi 'home' -->
-        <div data-aos="zoom-in" data-aos-duration="1000" class="Walpaper" ><img class="WallpaperCover" id="coverMain" src="assets/cover1.jpg" alt="cover" width="500px"></div>
+<div class="Walpaper">
+  <canvas id="circleCanvas"></canvas>
+  <img class="WallpaperCover" id="coverMain" src="assets/cover1.jpg" alt="cover">
+</div>
         <div class="home-content">
             <h3>What’s up? I'm</h3>
             <h1>M. Aziz Jaya </h1>
@@ -108,7 +112,7 @@
                 <h1 data-aos="fade-left" data-aos-duration="500" class="sub-title">My <span>services</span></h1>
                 <div class="services-list">
                     <div data-aos="flip-left" data-aos-duration="800">
-                        <i class='bx bx-code' style='color:#ce4dd5'  ></i>
+                        <i class='bx bx-code' style='color:var(--warna-utama)'  ></i>
                         <h2>UI/UX Design</h2>
                         <p>Creative designs using Canva, Photoshop, and GIMP for social media, branding, and digital content.</p>
                         <a href="#contact" class="read">Contact me</a>
@@ -116,37 +120,37 @@
                     
     
                     <div data-aos="flip-left" data-aos-duration="800">
-                        <i class='bx bx-crop' style='color:#ce4dd5'  ></i>
+                        <i class='bx bx-crop' style='color:var(--warna-utama)'  ></i>
                         <h2>Graphic Design</h2>
                         <p>Modern and user-friendly interfaces that focus on smooth navigation and great user experience.</p>
                         <a href="#contact" class="read">Contact me</a>
                     </div>
                     <div data-aos="flip-left" data-aos-duration="800">
-                        <i class='bx bxl-visual-studio' style='color:#ce4dd5'></i>
+                        <i class='bx bxl-visual-studio' style='color:var(--warna-utama)'></i>
                         <h2>Web Development</h2>
                         <p>Responsive websites built with HTML, CSS, and JavaScript, plus basic Node.js and Python features.</p>
                         <a href="#contact" class="read">Contact me</a>
                     </div>
                     <div data-aos="flip-left" data-aos-duration="800">
-                        <i class='bx bxl-whatsapp' style='color:#ce4dd5'></i>
+                        <i class='bx bxl-whatsapp' style='color:var(--warna-utama)'></i>
                         <h2>WhatsApp Bot Development</h2>
                         <p>Custom WhatsApp bots for group management, automation, and practical tools.</p>
                         <a href="#contact" class="read">Contact me</a>
                     </div>
                     <div data-aos="flip-left" data-aos-duration="800">
-                        <i class='bx bx-rocket' style='color:#ce4dd5'></i>
+                        <i class='bx bx-rocket' style='color:var(--warna-utama)'></i>
                         <h2>Automation Tools</h2>
                         <p>Simple automation scripts with Python and Node.js to save time and reduce repetitive work.</p>
                         <a href="#contact" class="read">Contact me</a>
                     </div>
                     <div data-aos="flip-left" data-aos-duration="800">
-                        <i class='bx bx-cloud-upload' style='color:#ce4dd5'></i>
+                        <i class='bx bx-cloud-upload' style='color:var(--warna-utama)'></i>
                         <h2>Website Maintenance</h2>
                         <p>Regular updates, performance optimization, and bug fixing to keep websites secure and reliable.</p>
                         <a href="#contact" class="read">Contact me</a>
                     </div>
                     <div data-aos="flip-left" data-aos-duration="800">
-                        <i class='bx bx-video' style='color:#ce4dd5'></i>
+                        <i class='bx bx-video' style='color:var(--warna-utama)'></i>
                         <h2>Content Creation Support</h2>
                         <p>Visuals and design elements that align with brand identity and enhance digital content.</p>
                         <a href="#contact" class="read">Contact me</a>
@@ -286,6 +290,7 @@
     <span id="minutes">00</span>
     <span id="seconds">00</span>
   </div>
+  <button id="gantiWarna">Ganti Warna</button>
   <button id="closeBtn"><i class='bx bxs-right-arrow-alt toggle-btnST'></i></button>
 <div class="sidebar-widget weather-widget">
   <div id="weather" class="weather-horizontal">Memuat...</div>
@@ -294,7 +299,9 @@
   </div>
     
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
+<script src="track.js"></script>
 <script src="main.js"></script>
+<script src="ch.js"></script>
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script>
   AOS.init();
