@@ -7,12 +7,37 @@
     <link rel="stylesheet" href="style.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
      <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  </div>
+</div>
 </head>
 <body>
+  <!-- ===== INTRO BOOT (auto runs once on load) ===== -->
+  <div id="intro" aria-hidden="false">
+    <div class="terminal" role="dialog" aria-label="Terminal boot screen">
+      <div class="term-header" aria-hidden="true">
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="cir" aria-hidden="true"></div>
+          <div class="cir" aria-hidden="true"></div>
+          <div class="cir" aria-hidden="true"></div>
+        </div>
+        <div class="term-title">axis@linux: boot</div>
+      </div>
 
-      <!-- Tombol Toggle -->
+      <div class="term-body scanlines">
+        <div class="lines" id="intro-lines" aria-live="polite"></div>
+        <div id="intro-cursor" style="margin-top:12px; display:flex; align-items:center; gap:6px; visibility:hidden;">
+          <span class="prompt">axis@linux:~$</span>
+          <span id="intro-input-placeholder" style="opacity:.9"></span>
+          <span class="typing-caret" aria-hidden="true"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- MAIN WEBSITE CONTENT -->
+<main id="main" class="main-hidden" aria-hidden="true">
   <button id="openBtn"><i class='bx toggle-btnS bxs-left-arrow-alt' style="font-size: 25px;"></i></button>
 
 <div id="swipe-area"></div>
@@ -50,9 +75,6 @@
   <input type="range" id="seek" class="seek" min="0" value="0" step="0.1">
 </div>
     <div class="lyrics" id="lyrics"></div>
-    <div class="playlist">
-    <h4 style="margin-top: 20px; margin-left: 20px; font-size: 25px;">Playlist</h4>
-    <ul id="playlist"></ul>
     </div>
     <audio id="audio"></audio>
   </div>
@@ -73,7 +95,7 @@
   <img class="WallpaperCover" id="coverMain" src="assets/cover1.jpg" alt="cover">
 </div>
         <div class="home-content">
-            <h3>What’s up? I'm</h3>
+            <h3 id="openPlaylist" >What’s up? I'm</h3>
             <h1>M. Aziz Jaya </h1>
             <h3>And I am a <span class="text"></span></h3>
             <p>I am a student 😎</p> <!-- perbaiki teks ke bahasa Inggris -->
@@ -95,14 +117,17 @@
         <div class="about-intro">
         
         <div data-aos="fade-right" data-aos-duration="1000" class="about-text">
-        <p id="text">
-            Hi! My name is M. Aziz Jaya (call me Ajis), a 15-year-old student from Bagelen 1, Pesawaran, Lampung. I’m passionate about coding, design, and technology, with skills in HTML, CSS, JavaScript, Python, and Node.js. I’ve created projects like music websites, portfolio sites, and WhatsApp bots, and my goal is to become a professional programmer.
-  <span id="dots">...</span>
-  <span id="more">
+<p id="text">
+  Hi! My name is M. Aziz Jaya (call me Ajis), a 15-year-old student from Bagelen 1, Pesawaran, Lampung. I’m passionate about coding, design, and technology, with skills in HTML, CSS, JavaScript, Python, and Node.js. I’ve created projects like music websites, portfolio sites, and WhatsApp bots, and my goal is to become a professional programmer.
+  <span id="dots"></span>
+
+  <span id="more" class="collapsed">
+    <br>
     Outside of coding, I enjoy playing games such as GTA San Andreas Multiplayer (JGRP server) and Mobile Legends, as well as listening to music on Spotify. I started coding out of curiosity, and now it has become my favorite way to learn, think logically, and explore new ideas.
   </span>
 </p>
-<button onclick="readMore()" id="btn" class="btn-box2">Baca Selengkapnya</button>
+
+<button onclick="readMore()" id="btn" class="btn-box2 expand-btn">Baca Selengkapnya</button>
         </div>
         </div>
     </section>
@@ -290,22 +315,91 @@
     <span id="minutes">00</span>
     <span id="seconds">00</span>
   </div>
-  <button id="gantiWarna">Ganti Warna</button>
+<button id="gantiWarna">Colors</button>
+
+<div id="colorPickerBox">
+  <input type="color" id="colorPicker">
+</div>
   <button id="closeBtn"><i class='bx bxs-right-arrow-alt toggle-btnST'></i></button>
 <div class="sidebar-widget weather-widget">
   <div id="weather" class="weather-horizontal">Memuat...</div>
 </div>
 </div>
   </div>
+</div>
+
+  <div id="playlistModal" class="playlist-modal">
+  <div class="playlist-content">
+            <span id="closePlaylist" class="close-btn">&times;</span>
+        <h2>Playlist</h2>
+    <ul id="popupPlaylist" class="popup-playlist"></ul>
+</div>
+
+
+</div>
+</main>
+
+  <!-- ===== TERMINAL OVERLAY (INTERACTIVE) - hidden until icon clicked ===== -->
+  <div id="terminalOverlay" class="overlay-hidden" aria-hidden="true">
+    <div class="terminal" role="dialog" aria-label="Interactive Terminal">
+      <div class="term-header" aria-hidden="true">
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="cir" aria-hidden="true"></div>
+          <div class="cir" aria-hidden="true"></div>
+          <div class="cir" aria-hidden="true"></div>
+        </div>
+        <div class="term-title">axis@linux</div>
+        <button class="term-close" id="termClose" aria-label="Close terminal">✕</button>
+      </div>
+
+      <div class="term-body scanlines" id="termBodyOverlay">
+        <div class="lines" id="linesOverlay" aria-live="polite"></div>
+
+        <div id="promptRowOverlay" class="prompt-row" style="display:flex;align-items:center;gap:10px;margin-top:12px;">
+          <span class="prompt-text" id="promptTextOverlay">axis@linux:~$</span>
+          <input id="termInputOverlay" class="term-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating terminal icon (icon-only) -->
+  <button id="terminalToggle" class="terminal-btn" aria-label="Open terminal" title="Terminal (⌨)">&gt;_</button>
+
+  <!-- Audio (sesuaikan path bila perlu) -->
+  <audio id="glitchSound" src="noise.wav" preload="auto"></audio>
+  <audio id="typeSound" src="assets/audio/type-click.mp3" preload="auto"></audio>
+  <audio id="errBeep" src="assets/audio/error-beep.mp3" preload="auto"></audio>
     
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
 <script src="track.js"></script>
 <script src="main.js"></script>
 <script src="ch.js"></script>
+<script src="terminal.js"></script>
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script>
   AOS.init();
 </script>
+  <input type="color" id="gradientColor1" style="display:none;">
+<input type="color" id="gradientColor2" style="display:none;">
+
+<div id="gradientPopup" class="gradient-popup">
+  <div class="gradient-box">
+    <h3>Edit Gradient</h3>
+
+    <label>Warna 1</label>
+    <input type="color" id="g1">
+
+    <label>Warna 2</label>
+    <input type="color" id="g2">
+
+    <label>Arah (0-360°)</label>
+    <input type="range" id="gAngle" min="0" max="360" value="90">
+
+    <div id="gradientPreview" class="gradient-preview"></div>
+
+    <button id="applyGradient">Apply</button>
+    <button id="closeGradient">Cancel</button>
     </body>
     </html>
 

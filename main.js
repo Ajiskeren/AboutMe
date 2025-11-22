@@ -29,18 +29,20 @@ const observer = new IntersectionObserver(
 observer.observe(homeSection);
 
 function readMore() {
-  let dots = document.getElementById("dots");
-  let moreText = document.getElementById("more");
-  let btn = document.getElementById("btn");
+  const dots = document.getElementById("dots");
+  const more = document.getElementById("more");
+  const btn = document.getElementById("btn");
 
-  if (dots.style.display === "none") {
-    dots.style.display = "inline";
-    btn.innerHTML = "Baca Selengkapnya";
-    moreText.style.display = "none";
-  } else {
+  const collapsed = more.classList.contains("collapsed");
+
+  if (collapsed) {
     dots.style.display = "none";
-    btn.innerHTML = "Sembunyikan";
-    moreText.style.display = "inline";
+    more.classList.remove("collapsed");
+    btn.textContent = "Sembunyikan";
+  } else {
+    dots.style.display = "inline";
+    more.classList.add("collapsed");
+    btn.textContent = "Baca Selengkapnya";
   }
 }
 
@@ -150,7 +152,6 @@ const coverMain = document.getElementById("coverMain");
 const videoCover = document.getElementById("videoCover");
 const title = document.getElementById("title");
 const artist = document.getElementById("artist");
-const playlistEl = document.getElementById("playlist");
 const canvas = document.getElementById("spectrum");
 const ctx = canvas.getContext("2d");
 const current = document.getElementById("current");
@@ -163,19 +164,64 @@ const ctx2 = circleCanvas.getContext("2d");
 let currentTrack = 0; // hanya 1 deklarasi di file
 let showVideo = false; // akan di-set pada loadTrack
 
-// Render playlist
-tracks.forEach((track, i) => {
-  const li = document.createElement("li");
-  li.textContent = track.title + " - " + track.artist;
-  li.addEventListener("click", () => loadTrack(i));
-  playlistEl.appendChild(li);
-});
+function renderPopupPlaylist() {
+  popupPlaylist.innerHTML = ""; // bersihin dulu
+
+  tracks.forEach((track, i) => {
+    const li = document.createElement("li");
+    li.textContent = `${track.title} - ${track.artist}`;
+
+    // klik untuk ganti lagu
+    li.addEventListener("click", () => {
+      loadTrack(i);
+      highlightPopupPlaylist();
+    });
+
+    popupPlaylist.appendChild(li);
+  });
+}
 
 // Highlight playlist
-function highlightPlaylist() {
-  [...playlistEl.children].forEach((el, i) => {
+function highlightPopupPlaylist() {
+  [...popupPlaylist.children].forEach((el, i) => {
     el.classList.toggle("active", i === currentTrack);
   });
+}
+
+const modal = document.getElementById("playlistModal");
+const closeBtnP = document.getElementById("closePlaylist");
+const popupPlaylist = document.getElementById("popupPlaylist");
+
+// Buka popup
+coverMain.addEventListener("click", () => {
+  modal.style.display = "flex";
+
+  // Animasi slide-up
+  setTimeout(() => {
+    modal.classList.add("show");
+    document.querySelector(".playlist-content").classList.add("show");
+  }, 10);
+
+  // Render playlist ke popup
+  renderPopupPlaylist();
+  highlightPopupPlaylist();
+});
+
+// Tutup popup (tombol X)
+closeBtnP.addEventListener("click", closePopup);
+
+// Tutup popup jika klik area luar
+window.addEventListener("click", (e) => {
+  if (e.target === modal) closePopup();
+});
+
+function closePopup() {
+  modal.classList.remove("show");
+  document.querySelector(".playlist-content").classList.remove("show");
+
+  setTimeout(() => {
+    modal.style.display = "none";
+  }, 450); // sesuai dengan durasi animasi CSS
 }
 
 function waitForEventOnce(target, eventName, timeoutMs = 2500) {
@@ -302,7 +348,7 @@ function loadTrack(index) {
   handleLyrics(track.src);
 
   // highlight playlist + autoplay
-  highlightPlaylist();
+  highlightPopupPlaylist(); // khusus popup
 
   audio.play().catch((e) => console.warn("audio play:", e));
   playBtn.textContent = "ツ";
@@ -575,6 +621,9 @@ function drawCircleSpectrum() {
   const imgW = 110; // ukuran gambar kamu
   const imgH = 110;
   const cornerRadius = imgW * 0.2; // 20%
+  const styles = getComputedStyle(document.documentElement);
+  const mainColor = styles.getPropertyValue("--warna-utama").trim();
+  const glowColor = styles.getPropertyValue("--warna-utama").trim();
 
   const expand = 55; // seberapa jauh spektrum menjauh dari gambar
 
@@ -625,10 +674,10 @@ function drawCircleSpectrum() {
   ctx2.closePath();
 
   // neon
-  ctx2.strokeStyle = "#c300ff";
+  ctx2.strokeStyle = mainColor;
   ctx2.lineWidth = 3;
   ctx2.shadowBlur = 20;
-  ctx2.shadowColor = "#ff00ff";
+  ctx2.shadowColor = glowColor;
 
   ctx2.stroke();
 
@@ -667,15 +716,15 @@ const openBtn = document.getElementById("openBtn");
 const closeBtn = document.getElementById("closeBtn");
 
 // Buka sidebar
-openBtn.addEventListener("click", () => {
+openBtn?.addEventListener("click", () => {
   sidebarS.classList.add("active");
-  openBtn.style.display = "none"; // sembunyikan tombol luar
+  openBtn.style.display = "none";
 });
 
 // Tutup sidebar
-closeBtn.addEventListener("click", () => {
+closeBtn?.addEventListener("click", () => {
   sidebarS.classList.remove("active");
-  openBtn.style.display = "block"; // munculkan lagi tombol luar
+  openBtn.style.display = "block";
 });
 
 function updateTime() {
