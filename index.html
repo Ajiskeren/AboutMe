@@ -21,6 +21,19 @@
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
   </head>
   <body>
+    <div id="sys-loader">
+      <div class="loader-container">
+        <div class="loader-text">SYSTEM BOOTING...</div>
+        <div class="loader-percent" id="load-percent">0%</div>
+        <div class="loader-bar">
+          <div id="loader-progress" class="bar-fill"></div>
+        </div>
+        <button id="btn-enter" class="enter-btn" style="display: none">
+          [ INITIALIZE SYSTEM ]
+        </button>
+      </div>
+    </div>
+
     <div id="intro" aria-hidden="false">
       <div class="terminal" role="dialog" aria-label="Terminal boot screen">
         <div class="term-header" aria-hidden="true">
@@ -644,5 +657,89 @@
         <button id="closeGradient">Cancel</button>
       </div>
     </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const percentText = document.getElementById("load-percent");
+        const progressBar = document.getElementById("loader-progress");
+        const enterBtn = document.getElementById("btn-enter");
+        const loader = document.getElementById("sys-loader");
+
+        // Ambil semua gambar di website
+        const images = document.querySelectorAll("img");
+        let imagesLoaded = 0;
+        const totalImages = images.length;
+
+        // Fungsi update persentase
+        function updateProgress() {
+          // Jika tidak ada gambar, langsung 100%
+          if (totalImages === 0) {
+            completeLoading();
+            return;
+          }
+
+          const percent = Math.round((imagesLoaded / totalImages) * 100);
+          percentText.innerText = percent + "%";
+          progressBar.style.width = percent + "%";
+
+          if (imagesLoaded === totalImages) {
+            completeLoading();
+          }
+        }
+
+        function completeLoading() {
+          percentText.innerText = "100%";
+          progressBar.style.width = "100%";
+
+          // Munculkan tombol masuk setelah delay sedikit
+          setTimeout(() => {
+            enterBtn.style.display = "inline-block";
+            document.querySelector(".loader-text").innerText = "SYSTEM READY";
+          }, 500);
+        }
+
+        // Loop setiap gambar untuk cek apakah sudah load
+        if (totalImages === 0) {
+          completeLoading();
+        } else {
+          images.forEach((img) => {
+            if (img.complete) {
+              imagesLoaded++;
+              updateProgress();
+            } else {
+              img.addEventListener("load", () => {
+                imagesLoaded++;
+                updateProgress();
+              });
+              img.addEventListener("error", () => {
+                imagesLoaded++; // Tetap hitung meski error agar tidak stuck
+                updateProgress();
+              });
+            }
+          });
+        }
+
+        // --- TOMBOL KLIK UNTUK MASUK & PLAY MUSIK ---
+        enterBtn.addEventListener("click", () => {
+          // 1. Play Musik (Ambil elemen audio kamu)
+          const audio = document.getElementById("audio"); // Pastikan ID ini sesuai dengan player kamu
+          if (audio) {
+            // Cek apakah ada source lagunya, kalau belum ada set dulu (opsional)
+            // audio.src = "assets/audio/music.mp3";
+            audio.play().catch((e) => console.log("Audio play error:", e));
+          }
+
+          // 2. Hilangkan Loading Screen
+          loader.style.transition = "opacity 0.5s ease";
+          loader.style.opacity = "0";
+
+          setTimeout(() => {
+            loader.style.display = "none";
+
+            // 3. Jalankan animasi Terminal Intro kamu yang lama
+            // (Pastikan div #intro display-nya diatur di CSS kamu sebelumnya)
+          }, 500);
+        });
+      });
+    </script>
   </body>
 </html>
