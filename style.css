@@ -17,72 +17,98 @@ body {
   transition: background-color 0.6s ease, color 0.6s ease;
 }
 
+/* =========================================
+   RETRO GLITCH TERMINAL THEME V2.0
+   By: Sarah for Ajis ❤️
+   ========================================= */
+
 :root {
   --warna-utama: #adadad;
   --warna-kedua: gold;
-  --dark-a: #000000;
-  --bg: #000;
-  --text: #e6e6e6;
-  --muted: #9a9a9a;
-  --error-red: #ff4d4d;
-  --accent: #9ad3ff;
-  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono",
-    "Courier New", monospace;
+  --bg: #050505; /* Lebih hitam pekat */
+  --text: #e0e0e0;
+  --muted: #888;
+  --error-red: #ff3333;
+  --accent: #00ffcc; /* Cyan neon buat highlight */
+
+  /* Font Hacker */
+  --mono: "Courier New", Courier, monospace;
+
+  /* Efek Glow CRT */
+  --text-glow: 0 0 2px rgba(224, 224, 224, 0.5),
+    0 0 5px rgba(224, 224, 224, 0.3);
+  --term-border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* ===== terminal / intro shared styles ===== */
+/* ===== LAYOUT DASAR ===== */
 #intro,
 #terminalOverlay {
   position: fixed;
   inset: 0;
   display: none;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 28px;
+  align-items: center; /* Center vertical */
+  justify-content: center; /* Center horizontal */
+  padding: 20px;
   box-sizing: border-box;
   z-index: 99999;
-  background: var(--bg);
+
+  /* Background semi-transparan gelap */
+  background: rgba(5, 5, 5, 0.85);
+  backdrop-filter: blur(5px); /* Efek blur di belakang terminal */
 }
 
 #terminalOverlay:not(.overlay-hidden) {
   display: flex;
+  animation: turn-on 0.4s ease-out forwards; /* Animasi TV Nyala */
 }
 
-/* intro override – visible saat halaman load */
 #intro {
   display: flex;
+  background: #000; /* Intro full hitam */
 }
 
-/* hide overlay by class */
 .overlay-hidden {
   display: none;
 }
 
-/* terminal card */
+/* ===== KOTAK TERMINAL (CRT STYLE) ===== */
 .terminal {
-  width: min(1000px, 94vw);
-  max-width: 1000px;
-  background: transparent;
-  border-radius: 6px;
-  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.8);
-  overflow: hidden;
+  display: flex;
+  flex-direction: column; /* Susun ke bawah: Header -> Body -> Keyboard */
+
+  /* UKURAN: Di Laptop dia kotak biasa, tapi... */
+  width: min(900px, 95vw);
+  height: 80vh;
+  max-height: 900px;
+
+  background: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+
+  overflow: hidden; /* PENTING: Biar isinya gak tumpah keluar */
+  position: relative;
 }
 
-/* header */
+/* Header Terminal */
 .term-header {
-  height: 34px;
+  height: 30px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
-  background: linear-gradient(180deg, #0b0b0b, #040404);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  position: relative;
+  padding: 0 12px;
+  background: #111;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 .cir {
   width: 10px;
   height: 10px;
   border-radius: 50%;
+  position: relative;
+}
+.cir:nth-child(1) {
   background: #ff5f56;
 }
 .cir:nth-child(2) {
@@ -91,204 +117,249 @@ body {
 .cir:nth-child(3) {
   background: #27c93f;
 }
+
+/* Judul Header */
 .term-title {
   margin-left: auto;
+  margin-right: auto;
+  font-family: var(--mono);
   font-size: 12px;
   color: var(--muted);
+  opacity: 0.7;
 }
 
 .term-close {
-  position: absolute;
-  right: 8px;
-  top: 4px;
-  background: transparent;
+  background: none;
   border: none;
   color: var(--muted);
-  font-size: 14px;
   cursor: pointer;
+  font-family: var(--mono);
+}
+.term-close:hover {
+  color: #fff;
 }
 
-/* body */
+/* ===== BODY & TEXT (GLOWING) ===== */
 .term-body {
-  padding: 18px;
-  background: linear-gradient(180deg, #000, #050505);
-  min-height: 420px;
-  box-sizing: border-box;
+  flex: 1; /* Isi sisa ruang */
+  padding: 15px;
+  background: #050505;
   color: var(--text);
-  font-size: 15px;
-  line-height: 1.35;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-y: auto; /* Scroll otomatis */
   position: relative;
-  overflow: auto;
+
+  /* Efek teks bersinar ala CRT */
+  text-shadow: var(--text-glow);
 }
 
-/* printed lines */
+/* Scrollbar Keren */
+.term-body::-webkit-scrollbar {
+  width: 8px;
+}
+.term-body::-webkit-scrollbar-track {
+  background: #000;
+}
+.term-body::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+.term-body::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Baris Teks */
 .lines {
   white-space: pre-wrap;
   word-break: break-word;
-  font-family: var(--mono);
-  color: var(--text);
 }
 
-/* prompt row */
+/* Prompt Input Area */
 .prompt-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 12px;
-  position: sticky;
-  bottom: 6px;
-  background: transparent;
+  gap: 8px;
+  margin-top: 10px;
 }
+
 .prompt-text {
-  color: var(--muted);
-  font-family: var(--mono);
+  color: var(--accent); /* Warna prompt (axis@linux) jadi cyan */
+  text-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
+  font-weight: bold;
 }
+
 .term-input {
   flex: 1;
   background: transparent;
   border: none;
   outline: none;
-  color: var(--text);
+  color: #fff;
   font-family: var(--mono);
-  font-size: 15px;
+  font-size: 14px;
+  text-shadow: var(--text-glow);
   caret-color: var(--accent);
 }
-.term-input::placeholder {
-  color: rgba(255, 255, 255, 0.12);
+
+/* ===== EFEK RETRO SCANLINES & FLICKER ===== */
+
+/* Garis-garis TV (Bergerak) */
+.scanlines::before {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 2;
+  pointer-events: none; /* Biar bisa diklik tembus */
 }
 
-/* error lines */
+/* Garis scan berjalan (Rolling bar) */
+.scanlines::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(18, 16, 16, 0.1);
+  opacity: 0;
+  z-index: 2;
+  pointer-events: none;
+  animation: scanline 8s linear infinite;
+}
+
+/* Animasi Flicker (Kedip halus) */
+.term-body {
+  animation: flicker 0.15s infinite;
+}
+
+/* ERROR STYLE */
 .lines .error {
   color: var(--error-red);
-  font-weight: 600;
+  text-shadow: 0 0 5px var(--error-red);
 }
-.lines .blink {
-  animation: error-blink 340ms steps(1) 3;
-}
-@keyframes error-blink {
+
+/* ===== ANIMASI KEYFRAMES ===== */
+
+/* 1. Efek TV Nyala (Keren banget ini!) */
+@keyframes turn-on {
   0% {
-    opacity: 1;
+    transform: scale(1, 0.005) skewX(50deg);
+    opacity: 0;
+    filter: brightness(5);
   }
   50% {
-    opacity: 0.35;
+    transform: scale(1, 0.005) skewX(-10deg);
+    opacity: 1;
   }
   100% {
+    transform: scale(1, 1) skewX(0deg);
     opacity: 1;
+    filter: brightness(1);
   }
 }
 
-/* scanning effect / scanlines */
-.scanlines::after {
-  content: "";
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  background-image: linear-gradient(
-    rgba(255, 255, 255, 0.01) 1px,
-    transparent 1px
-  );
-  background-size: 100% 3px;
-  mix-blend-mode: overlay;
-  opacity: 0.16;
-  z-index: 1;
-}
-
-/* glitch animation */
-.glitch .term-body {
-  animation: glitch-anim 620ms linear 1 forwards;
-}
-@keyframes glitch-anim {
+/* 2. Efek Garis Jalan */
+@keyframes scanline {
   0% {
-    transform: none;
-    filter: none;
-    opacity: 1;
-    text-shadow: none;
+    transform: translateY(-100%);
+    opacity: 0.1;
   }
-  10% {
-    transform: translateX(-8px) skewX(-3deg);
-    filter: contrast(130%);
-    text-shadow: -2px 0 rgba(255, 77, 77, 0.85);
+  50% {
+    opacity: 0.1;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0.1;
+  }
+}
+
+/* 3. Efek Layar Kedip (Flicker) */
+@keyframes flicker {
+  0% {
+    opacity: 0.97;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.98;
+  }
+}
+
+/* 4. Glitch Effect saat Booting/Error */
+.glitch .term-body {
+  animation: glitch-skew 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+  color: red; /* Error jadi merah pas glitch */
+}
+@keyframes glitch-skew {
+  0% {
+    transform: translate(0);
   }
   20% {
-    transform: translateX(6px) skewX(3deg);
-    text-shadow: 2px 0 rgba(0, 220, 255, 0.65);
+    transform: translate(-2px, 2px);
   }
-  35% {
-    transform: translateX(-14px) skewX(-5deg);
-    opacity: 0.85;
-    filter: hue-rotate(-15deg) saturate(120%);
+  40% {
+    transform: translate(-2px, -2px);
   }
-  50% {
-    transform: translateX(10px) skewX(4deg);
+  60% {
+    transform: translate(2px, 2px);
   }
-  70% {
-    transform: translateX(-6px) skewX(-2deg);
-    opacity: 0.6;
+  80% {
+    transform: translate(2px, -2px);
   }
   100% {
-    transform: translateX(0) skewX(0);
-    opacity: 0;
-    filter: none;
-    text-shadow: none;
+    transform: translate(0);
   }
 }
 
-/* glitch flash overlay created by JS */
-.glitch-flash {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 5;
-  background: radial-gradient(
-      circle at 20% 20%,
-      rgba(255, 77, 77, 0.18),
-      transparent 25%
-    ),
-    linear-gradient(rgba(255, 255, 255, 0.02), transparent 30%);
-  animation: flash-pop 620ms ease-out forwards;
-}
-@keyframes flash-pop {
-  0% {
-    opacity: 0;
-    transform: scale(1.02);
-  }
-  30% {
-    opacity: 0.95;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0.98);
-  }
+/* Tombol Terminal di Pojok */
+.terminal-btn {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 100;
+  background: #000;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-weight: bold;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+  transition: all 0.3s ease;
 }
 
-/* main reveal (ke halaman setelah terminal disembunyikan) */
+.terminal-btn:hover {
+  background: var(--accent);
+  color: #000;
+  box-shadow: 0 0 20px var(--accent);
+  transform: scale(1.1);
+}
+
+/* Main Content Hide Transition */
 .main-hidden {
   opacity: 0;
+  transition: opacity 0.5s;
   pointer-events: none;
-  transition: opacity 0.4s ease;
 }
-
 .main-hidden.show {
   opacity: 1;
   pointer-events: auto;
-}
-/* terminal toggle button (icon-only) */
-.terminal-btn {
-  position: fixed;
-  left: 18px;
-  bottom: 18px;
-  z-index: 10;
-  background: #0d0d0d;
-  color: var(--text);
-  border: none;
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
-  font-family: var(--mono);
-  font-size: 18px;
-  cursor: pointer;
 }
 
 /* responsive */
@@ -309,18 +380,111 @@ body {
   }
 }
 
+/* --- Header Utama dengan Efek Kaca --- */
+/* --- 1. GLOBAL RESET (Wajib Ada) --- */
+
+/* --- 2. HEADER UTAMA --- */
+/* --- Header Wrapper --- */
+/* --- Header dengan GRID System --- */
 header {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 5%;
-  padding: 20px 5%;
-  background: #000000;
-  display: flex;
-  justify-content: space-between;
+  right: 0; /* PENTING: Pengganti width: 100% agar tidak offside */
+
+  padding: 15px 5%; /* Jarak dalam kiri-kanan */
+
+  /* GRID SYSTEM */
+  display: grid;
+  grid-template-columns: auto 1fr; /* Logo auto, Menu sisa ruang */
   align-items: center;
+
+  /* Tampilan */
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 200;
+
+  /* Memastikan padding tidak menambah lebar elemen */
+  box-sizing: border-box;
+}
+
+/* --- Logo (Grid Item 1) --- */
+.logo {
+  font-size: 24px;
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* --- Navbar (Grid Item 2) --- */
+/* --- Navbar Layout --- */
+.navbar {
+  justify-self: end;
+  display: grid;
+  grid-auto-flow: column;
+  gap: 10px; /* Jarak antar tombol */
+}
+
+/* --- Styling Tombol Link --- */
+.navbar a {
+  display: flex; /* Agar icon dan teks sejajar */
+  align-items: center;
+  gap: 0; /* Awalnya 0, biar rapet */
+
+  padding: 8px 5px;
+  background: transparent;
+  border-radius: 10px; /* Bentuk kapsul */
+  text-decoration: none;
+  color: var(--text);
+  font-size: 18px; /* Ukuran Icon */
+  transition: all 0.4s ease; /* Kecepatan animasi */
+  position: relative;
+}
+
+/* --- Teks Menu (Disembunyikan Default) --- */
+.nav-text {
+  max-width: 0; /* Lebar 0 = hilang */
+  overflow: hidden; /* Sembunyikan sisa teks */
+  opacity: 0; /* Transparan */
+  white-space: nowrap; /* Teks dilarang turun baris */
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.4s ease;
+}
+
+/* --- EFEK AJAIB (Hover & Active) --- */
+/* Saat mouse hover ATAU link punya class 'active' */
+/* --- 1. EFEK SAAT MOUSE DI ARAHKAN (HOVER) --- */
+/* Saat di-hover: Muncul background & teks meluncur keluar */
+.navbar a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  gap: 10px; /* Beri jarak icon-teks */
+  color: var(--warna-utama); /* Warna jadi biru */
+}
+
+.navbar a:hover .nav-text {
+  max-width: 100px; /* Buka lebar teks */
+  opacity: 1; /* Teks muncul */
+}
+
+/* --- 2. EFEK SAAT MENU AKTIF (ACTIVE) --- */
+/* Saat class="active" ada (misal di Home), CUMA ganti warna icon saja.
+   Teks JANGAN dimunculkan. */
+.navbar a.active {
+  color: var(--warna-utama); /* Icon jadi biru */
+}
+
+/* Pastikan teks tetap sembunyi walaupun aktif, KECUALI kalau di-hover juga */
+.navbar a.active .nav-text {
+  max-width: 0; /* Tetap tutup */
+  opacity: 0;
+}
+
+/* Kalau tombol Active LALU di-Hover, baru buka teksnya */
+.navbar a.active:hover .nav-text {
+  max-width: 100px;
+  opacity: 1;
 }
 
 #swipe-area {
@@ -369,59 +533,63 @@ header {
   padding: 10px 0;
 }
 
-/* === SLIDER TRACK FIX === */
+/* Container Slider */
+.slider-container {
+  width: 100%;
+  padding: 10px 0;
+  position: relative;
+}
+
+/* Style Range Input */
 .seek {
   appearance: none;
   -webkit-appearance: none;
   width: 100%;
-  height: 7px;
-  background: linear-gradient(90deg, gold 0%, #d0d0d0 0%);
+  height: 6px;
+  /* Background akan di-handle oleh JS (Linear Gradient) */
+  background: #d0d0d0;
   border-radius: 10px;
   outline: none;
-  transition: background 0.25s ease;
   cursor: pointer;
 }
 
-/* Track smooth */
-.seek::-webkit-slider-runnable-track {
-  border-radius: 10px;
-}
-
-.seek::-moz-range-track {
-  height: 7px;
-  border-radius: 10px;
-}
-
-/* Thumb modern */
+/* THUMB (Jempol) Chrome/Safari/Edge */
 .seek::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  background: white;
-  border: 2px solid var(--warna-utama);
-  border-radius: 50%;
-  box-shadow: 0 0 6px rgba(79, 172, 254, 0.7);
-  transition: 0.2s;
+  appearance: none;
+  width: 32px;
+  height: 32px;
+
+  /* Reset style kotak */
+  background-color: transparent;
+  border: none;
+
+  /* Gambar Emoji dari Variable */
+  background-image: var(--thumb-emoji);
+  background-repeat: no-repeat;
+  background-position: center;
+
+  /* Filter Drop Shadow mengikuti warna utama */
+  filter: drop-shadow(0 0 5px var(--warna-utama));
+
+  margin-top: -13px; /* Penyesuaian posisi vertikal */
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .seek::-webkit-slider-thumb:hover {
-  transform: scale(1.25);
-  box-shadow: 0 0 10px rgba(79, 172, 254, 0.9);
+  transform: scale(1.5) rotate(10deg);
 }
 
+/* THUMB Firefox */
 .seek::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  background: white;
-  border: 2px solid #4facfe;
-  border-radius: 50%;
-  box-shadow: 0 0 6px rgba(79, 172, 254, 0.7);
-  transition: 0.2s;
-}
-
-.seek::-moz-range-thumb:hover {
-  transform: scale(1.25);
-  box-shadow: 0 0 10px rgba(79, 172, 254, 0.9);
+  width: 32px;
+  height: 32px;
+  background-color: transparent;
+  border: none;
+  background-image: var(--thumb-emoji);
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 5px var(--warna-utama));
 }
 
 /* Animasi berputar */
@@ -463,37 +631,6 @@ header {
 
 .content {
   padding: 20px;
-}
-
-.logo {
-  position: relative;
-  font-size: 16px;
-  color: #fff;
-  text-decoration: none;
-  font-weight: 600;
-  cursor: default;
-}
-
-.navbar {
-  display: flex;
-  justify-content: space-evenly;
-  width: 65%;
-}
-
-.navbar a {
-  font-size: 16px;
-  color: #fff;
-  text-decoration: none;
-  font-weight: 500;
-  margin-left: 0px;
-  transition: 0.3s;
-  opacity: 0;
-  animation: slideTop 0.5s ease forwards;
-  animation-delay: calc(0.2 * var(--i));
-}
-
-.navbar a:hover {
-  color: var(--warna-utama);
 }
 
 .home {
@@ -650,7 +787,8 @@ header {
 }
 
 .about-text {
-  justify-content: center;
+  max-width: 800px; /* Batasi lebar agar enak dibaca */
+  margin: 0 auto; /* Tengahkan container */
 }
 
 .about-text h2 {
@@ -671,10 +809,22 @@ header {
   align-items: center;
 }
 .about-text p {
+  word-spacing: 0px;
   font-size: 16px;
-  text-align: left;
+  text-align: justify; /* Rata kanan-kiri agar lebih rapi */
+  line-height: 1.6;
   margin-bottom: 20px;
-  padding: 0 0px;
+  color: var(--text); /* Pastikan warna teks terlihat */
+}
+
+/* LOGIKA UTAMA: Menyembunyikan teks */
+.collapsed {
+  display: none;
+}
+
+/* Styling Dots (...) */
+#dots {
+  display: inline;
 }
 
 #services {
@@ -1145,46 +1295,82 @@ section {
   box-shadow: 0 0 20px var(--warna-utama);
 }
 
+.contact-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .contact-form form {
   position: relative;
-  padding: 30px;
+  padding: 40px;
+  width: 100%;
+  max-width: 600px; /* Membatasi lebar agar tidak terlalu panjang */
   z-index: 2;
+  /* Opsional: Tambahkan background tipis pada container form */
+  /* background: rgba(255, 255, 255, 0.05); */
+  /* backdrop-filter: blur(10px); */
+  /* border-radius: 15px; */
 }
+
 .contact-form form input,
 .contact-form form textarea {
-  border: none;
-  outline: none;
   width: 100%;
-  padding: 18px;
-  background: #555557;
-  color: #000;
+  padding: 15px 20px;
+  background: rgba(255, 255, 255, 0.1); /* Transparan */
+  border: 2px solid transparent; /* Border default transparan */
+  outline: none;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
   font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  border-radius: 0.5rem;
+  color: #fff; /* Teks putih agar kontras di background gelap */
+  font-weight: 500;
+  transition: 0.3s ease;
+  backdrop-filter: blur(5px);
 }
+
+/* Mengubah warna placeholder agar tidak terlalu terang */
+.contact-form form input::placeholder,
+.contact-form form textarea::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Efek saat input diklik/aktif */
+.contact-form form input:focus,
+.contact-form form textarea:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--warna-utama); /* Border menyala sesuai warna utama */
+  box-shadow: 0 0 10px rgba(0, 238, 255, 0.2);
+  transform: scale(1.02); /* Sedikit membesar */
+}
+
 .contact-form textarea {
-  resize: none;
-  height: 70px;
+  resize: vertical; /* User bisa tarik ke bawah, tapi tidak ke samping */
+  min-height: 120px; /* Lebih tinggi agar nyaman mengetik pesan */
 }
+
 .contact-form form .send {
-  height: 30px;
   display: inline-block;
-  padding: 0px 20px;
+  padding: 12px 35px; /* Padding lebih besar agar tombol lebih 'fat' */
   background: var(--warna-utama);
   border-radius: 40px;
+  border: none;
   font-size: 16px;
   color: #081b29;
   letter-spacing: 1px;
-  text-decoration: none;
-  font-weight: 600;
-  box-shadow: 0 0 5px var(--warna-utama), 0 0 25px var(--warna-utama);
+  font-weight: 700;
+  cursor: pointer; /* Menambahkan cursor tangan */
+  transition: 0.3s ease;
+  box-shadow: 0 0 10px var(--warna-utama);
 }
+
 .contact-form form .send:hover {
-  box-shadow: 0 0 5px var(--warna-utama), 0 0 25px var(--warna-utama),
-    0 0 50px var(--warna-utama), 0 0 100px var(--warna-utama),
-    0 0 200px var(--warna-utama);
+  box-shadow: 0 0 5px var(--warna-utama), 0 0 20px var(--warna-utama),
+    0 0 50px var(--warna-utama);
+  transform: translateY(-3px); /* Tombol naik sedikit saat di-hover */
+  color: #fff; /* Opsional: teks jadi putih saat hover */
 }
+
 @media (max-width: 768px) {
   .contact {
     grid-template-columns: 1fr; /* Agar layout menjadi satu kolom di layar kecil */
@@ -1206,7 +1392,8 @@ section {
   width: 100%;
   text-align: center;
   padding: 2px 0;
-  background: rgb(7, 85, 91);
+  color: var(--warna-utama);
+  background: gray;
   font-weight: 300;
   margin-top: 30px;
 }
@@ -1248,23 +1435,63 @@ section {
   border-radius: 5px;
 }
 
+/* Container Utama */
 .controls {
   display: flex;
-  justify-content: space-around;
-  margin: 20px 0;
+  align-items: center; /* Menjaga posisi vertikal rata tengah */
+  justify-content: center;
+  gap: 20px; /* Jarak antar tombol */
+  margin: 15px 0;
 }
 
-.controls button {
-  font-size: 16px;
-  background: #333;
+/* Reset dasar untuk semua tombol control */
+.btn-control {
   border: none;
+  background: #333; /* Warna dasar */
   color: #fff;
-  padding: 0px 20px;
-  border-radius: 6px;
   cursor: pointer;
+  border-radius: 50%; /* Membuat tombol bulat */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease; /* Animasi halus */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Bayangan */
 }
-.controls button:hover {
-  background: #555;
+
+/* Ukuran untuk tombol Previous dan Next */
+#prev,
+#next {
+  width: 30px;
+  height: 30px;
+  font-size: 24px;
+}
+
+/* Gaya Khusus untuk Tombol Play (Lebih besar & Menonjol) */
+.btn-main {
+  width: 45px; /* Lebih besar */
+  height: 45px;
+  font-size: 38px; /* Ikon lebih besar */
+  background: linear-gradient(
+    135deg,
+    gray,
+    var(--warna-utama)
+  ); /* Warna Gradien Biru */
+  box-shadow: 0 10px 20px var(--warna-utama); /* Bayangan berwarna */
+}
+
+/* Efek saat mouse diarahkan (Hover) */
+.btn-control:hover {
+  transform: translateY(-3px); /* Naik sedikit */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.btn-main:hover {
+  box-shadow: 0 15px 30px var(--warna-utama);
+}
+
+/* Efek saat tombol ditekan (Click) */
+.btn-control:active {
+  transform: scale(0.95); /* Mengecil sedikit seolah ditekan */
 }
 
 #seek {
@@ -1354,10 +1581,41 @@ section {
 }
 
 .time {
-  width: 40%;
+  /* Posisi & Layout */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px auto;
+
+  /* Tampilan Kotak/Badge */
+  width: fit-content; /* Lebar menyesuaikan isi, bukan fix 40% */
+  padding: 8px 20px;
+  background: rgba(255, 255, 255, 0.05); /* Latar belakang transparan halus */
+  border-radius: 30px; /* Membuat bentuk kapsul */
+  border: 1px solid rgba(255, 255, 255, 0.1); /* Border tipis estetik */
+
+  /* Tipografi */
+  font-family: "Consolas", "Courier New", monospace; /* Wajib monospace agar angka stabil */
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+/* Agar angka tetap diam tidak goyang saat berubah */
+#current,
+#duration {
+  font-variant-numeric: tabular-nums;
+  min-width: 40px; /* Menjaga lebar minimum */
   text-align: center;
-  margin: 10px 0px;
-  font-size: 16px;
+}
+
+/* Warna separator garis miring */
+.separator {
+  color: var(
+    --warna-utama
+  ); /* Aksen biru cyan agar serasi dengan tombol Play tadi */
+  font-weight: bold;
+  opacity: 0.8;
 }
 
 .spectrum {
@@ -1709,97 +1967,220 @@ section {
   background: transparent;
 }
 
-/* Tombol Playlist */
+/* =========================================
+   MODERN DARK GLASS PLAYLIST
+   ========================================= */
+
+/* 1. TOMBOL PEMBUKA (Floating Button)
+   Posisi: Melayang di pojok kanan bawah (di atas tombol scroll-up) */
 .playlist-btn {
-  margin: 10px;
-  padding: 8px 15px;
-  font-size: 17px;
-  border: none;
-  border-radius: 12px;
+  position: fixed;
+  bottom: 90px; /* Jarak dari bawah (di atas tombol Scroll Up) */
+  right: 20px;
+  z-index: 998;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px 20px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  background: rgba(10, 10, 10, 0.6);
   backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.25);
+  color: var(--warna-utama);
+  font-family: var(--mono); /* Font terminal kamu */
+  font-size: 14px;
+  font-weight: 600;
+
   cursor: pointer;
-  transition: 0.3s;
-}
-.playlist-btn:hover {
-  background: rgba(255, 255, 255, 0.4);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
-/* Background popup */
+.playlist-btn:hover {
+  background: var(--warna-utama);
+  color: #000;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 25px var(--warna-utama); /* Efek glow */
+}
+
+/* 2. BACKGROUND MODAL (Overlay) */
 .playlist-modal {
   position: fixed;
   inset: 0;
-  display: none;
+  z-index: 10000;
+
+  display: flex;
   justify-content: center;
-  align-items: flex-end; /* Muncul dari BAWAH */
+  align-items: flex-end; /* Default: Muncul dari bawah */
+
+  background: rgba(0, 0, 0, 0); /* Awal transparan */
   backdrop-filter: blur(0px);
-  background: rgba(0, 0, 0, 0);
-  z-index: 9999;
 
+  pointer-events: none; /* Klik tembus saat tertutup */
   opacity: 0;
-  transition: opacity 0.35s ease, backdrop-filter 0.35s ease,
-    background 0.35s ease;
+  transition: all 0.4s ease;
 }
 
-/* Saat aktif */
+/* Saat Aktif */
 .playlist-modal.show {
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.6); /* Gelap */
+  backdrop-filter: blur(8px);
   opacity: 1;
-  backdrop-filter: blur(6px);
-  background: rgba(0, 0, 0, 0.35);
 }
 
-/* Konten popup (BOTTOM SHEET STYLE) */
+/* 3. KONTEN PLAYLIST (KARTU UTAMA) */
 .playlist-content {
+  position: relative;
   width: 100%;
-  max-width: 450px;
-  max-height: 70%;
-  border-radius: 25px 25px 0 0;
-  padding: 25px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(15px);
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
+  max-width: 500px;
+  height: 70vh; /* Tinggi 70% layar */
 
-  /* AWAL: tersembunyi di bawah */
+  /* Desain Kaca Gelap Premium */
+  background: rgba(18, 18, 18, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid var(--warna-utama); /* Aksen warna di atas */
+
+  /* Bentuk */
+  border-radius: 25px 25px 0 0; /* Lengkung atas saja untuk Mobile */
+  padding: 20px;
+  box-shadow: 0 -10px 50px rgba(0, 0, 0, 0.8);
+
+  /* Animasi Masuk */
   transform: translateY(100%);
   opacity: 0;
-  overflow-y: auto;
+  transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease;
 
-  transition: transform 0.45s cubic-bezier(0.25, 0.8, 0.25, 1),
-    opacity 0.4s ease;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Saat aktif */
+/* Desktop Tweak: Agar melayang (floating) tidak nempel bawah banget */
+@media (min-width: 769px) {
+  .playlist-modal {
+    align-items: center; /* Di tengah layar untuk PC */
+  }
+  .playlist-content {
+    height: 600px;
+    border-radius: 20px; /* Lengkung semua sisi */
+    transform: translateY(50px) scale(0.9); /* Efek Zoom in dikit */
+  }
+}
+
+/* Saat Muncul */
 .playlist-content.show {
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
   opacity: 1;
 }
 
-/* Tombol X */
-.close-btn {
-  float: right;
-  font-size: 35px;
-  cursor: pointer;
-  color: white;
-  transition: 0.25s;
-}
-.close-btn:hover {
-  transform: scale(1.2);
+/* 4. HEADER & TOMBOL CLOSE */
+/* Handle Bar (Garis kecil di atas - Kosmetik UI Mobile) */
+.playlist-content::before {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  margin: 0 auto 15px auto;
 }
 
-/* Item lagu */
-.popup-playlist li {
-  padding: 12px;
-  margin: 8px 0;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 28px;
+  color: #888;
   cursor: pointer;
-  color: white;
-  list-style: none;
-  transition: 0.2s ease;
+  transition: 0.3s;
+  line-height: 1;
 }
+.close-btn:hover {
+  color: var(--error-red);
+  transform: rotate(90deg);
+}
+
+.playlist-content h2 {
+  font-size: 20px;
+  color: #fff;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+}
+
+/* 5. LIST LAGU */
+.popup-playlist {
+  overflow-y: auto;
+  padding-right: 5px;
+  flex: 1; /* Mengisi sisa ruang */
+}
+
+/* Item Lagu */
+.popup-playlist li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 12px 15px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #ccc;
+  list-style: none;
+  font-size: 14px;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Hover Effect */
 .popup-playlist li:hover {
-  background: rgba(255, 255, 255, 0.35);
-  transform: scale(1.03);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(5px);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ACTIVE STATE (Lagu yang sedang diputar) */
+.popup-playlist li.active {
+  background: var(--warna-utama);
+  color: #000;
+  font-weight: 700;
+  border-color: var(--warna-utama);
+  box-shadow: 0 0 15px var(--warna-utama);
+}
+
+/* Icon kecil otomatis */
+.popup-playlist li::before {
+  content: "\ea1b"; /* Kode icon boxicon (music) atau ganti "🎵" */
+  font-family: "boxicons";
+  margin-right: 10px;
+  opacity: 0.5;
+}
+.popup-playlist li.active::before {
+  content: "Playing"; /* Kode icon play */
+  opacity: 1;
+}
+
+/* 6. SCROLLBAR CANTIK (Tipis) */
+.popup-playlist::-webkit-scrollbar {
+  width: 5px;
+}
+.popup-playlist::-webkit-scrollbar-track {
+  background: transparent;
+}
+.popup-playlist::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}
+.popup-playlist::-webkit-scrollbar-thumb:hover {
+  background: var(--warna-utama);
 }
 
 /* Glitch cepat */
@@ -1840,3 +2221,108 @@ section {
   opacity: 0;
   transition: opacity 0.4s ease-out;
 }
+
+/* ===== RETRO VIRTUAL KEYBOARD (FIXED & RESPONSIVE) ===== */
+.retro-keyboard {
+  width: 100%;
+  box-sizing: border-box; /* Biar padding gak bikin lebar */
+  padding: 8px 4px; /* Padding dikit aja */
+  background: #111;
+  border-top: 1px solid var(--accent);
+  display: flex;
+  flex-direction: column;
+  gap: 5px; /* Jarak antar baris */
+  z-index: 999;
+}
+
+.kb-row {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  gap: 3px; /* Jarak antar tombol diperkecil */
+}
+
+.key {
+  /* RAHASIANYA DISINI: Flex 1 biar semua tombol bagi rata */
+  flex: 1;
+  min-width: 0; /* Mencegah tombol maksa lebar */
+  height: 40px; /* Tinggi tombol pas buat jempol */
+
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--muted);
+  border-radius: 4px;
+
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: bold;
+
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+
+  /* Efek Transisi */
+  transition: all 0.1s ease;
+}
+
+/* Tombol Spesial (Biar proporsional) */
+.key.space {
+  flex: 5;
+} /* Spasi lebih lebar 5x */
+.key.enter {
+  flex: 2;
+  border-color: var(--error-red);
+  color: var(--error-red);
+}
+.key.special {
+  flex: 1.5;
+  font-size: 10px;
+} /* CLR dan Backspace agak lebar dikit */
+
+/* EFEK GLOW & HOVER */
+.key:active,
+.key.active {
+  background: var(--accent);
+  color: #000;
+  transform: scale(0.95);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+/* ===== KHUSUS HP (TAMPILAN FULL LAYAR) ===== */
+@media (max-width: 768px) {
+  #terminalOverlay {
+    padding: 0; /* Hapus jarak pinggir di HP */
+    align-items: flex-end; /* Mulai dari bawah */
+  }
+
+  .terminal {
+    /* MENGISI LAYAR PENUH */
+    width: 100vw; /* Lebar mentok */
+    height: 100dvh; /* Tinggi mentok dinamis (Dynamic Viewport Height) */
+    max-height: none; /* Hapus batasan tinggi */
+    border-radius: 0; /* Hapus lengkungan sudut biar rapi */
+    border: none;
+  }
+  
+  .term-header {
+    padding-top: 10px; /* Tambah jarak dikit di atas buat status bar HP */
+    height: 50px; /* Header agak gedean dikit biar gampang ditekan */
+  }
+}
+
+  .key {
+    height: 38px; /* Tombol agak pendek dikit */
+    font-size: 12px; /* Huruf dikecilin biar muat */
+    padding: 0;
+  }
+
+  .kb-row {
+    gap: 2px; /* Jarak super rapat buat HP kecil */
+  }
+
+  /* Baris kedua (A-L) biasanya lebih pendek jumlahnya, kita kasih padding kiri kanan */
+  .kb-row:nth-child(2) {
+    padding: 0 5%;
+  }

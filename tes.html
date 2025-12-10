@@ -1,0 +1,339 @@
+<!doctype html>
+
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>3D Chess — Powerful Model-Swapping Prototype</title>
+  <style>
+    html,body{height:100%;margin:0;font-family:system-ui,Segoe UI,Roboto;background:#0b0b0b;color:#eee}
+    #app{width:100%;height:100vh;display:flex;}
+    #canvasArea{flex:1;position:relative}
+    canvas{display:block}
+    #ui{width:360px;background:linear-gradient(180deg,#0f1724 0%,#071126 100%);padding:14px;box-shadow:0 0 40px rgba(0,0,0,0.6);overflow:auto}
+    h2{margin:6px 0 12px;font-size:18px}
+    label{display:block;margin:8px 0 4px;font-size:13px;color:#bfc7d6}
+    select,input[type=file],button{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);color:#fff}
+    .row{display:flex;gap:8px}
+    .row > *{flex:1}
+    .small{font-size:12px;padding:6px}
+    #log{font-family:monospace;background:#081019;padding:8px;border-radius:8px;margin-top:8px;height:120px;overflow:auto;color:#8ab4ff}
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="canvasArea"></div><div id="ui">
+  <h2>3D Chess — Model Switcher</h2>
+  <div style="font-size:13px;color:#a8b3c7;margin-bottom:8px">Fitur utama: papan 3D, logika catur lengkap (chess.js), drag & drop, ganti set model (unggah .glb per piece atau pakai preset URL), scale & offset per model.</div>
+
+  <label>Preset models</label>
+  <select id="presetSelect">
+    <option value="none">— Pilih preset (kosong = built-in low-poly) —</option>
+    <option value="classic">Classic (external .glb URLs — but you must host them)</option>
+    <option value="fantasy">Fantasy (placeholder URLs)</option>
+  </select>
+
+  <label>Atur model manual (unggah .glb untuk satu piece type)</label>
+  <div style="font-size:12px;color:#9aa7bf">Pilih tipe piece lalu unggah file .glb/.gltf untuk mengganti model tipe tersebut.</div>
+  <div class="row" style="margin-top:8px">
+    <select id="pieceType" class="small">
+      <option value="p">Pawn</option>
+      <option value="r">Rook</option>
+      <option value="n">Knight</option>
+      <option value="b">Bishop</option>
+      <option value="q">Queen</option>
+      <option value="k">King</option>
+    </select>
+    <input id="fileInput" type="file" accept=".glb,.gltf" />
+  </div>
+  <button id="uploadBtn" style="margin-top:8px">Unggah & Terapkan ke tipe</button>
+
+  <label>Skala & offset model (per tipe)</label>
+  <div class="row">
+    <input id="scaleInput" type="number" step="0.01" value="1" />
+    <input id="yOffsetInput" type="number" step="0.01" value="0" />
+  </div>
+  <button id="applyTransform" style="margin-top:8px">Terapkan Transform ke tipe terpilih</button>
+
+  <label>Kontrol permainan</label>
+  <div style="display:flex;gap:8px;margin-top:6px">
+    <button id="resetBtn">Reset Posisi</button>
+    <button id="undoBtn">Undo</button>
+  </div>
+
+  <label>Mode tampilan</label>
+  <div style="display:flex;gap:8px;margin-top:6px">
+    <button id="orbitBtn" class="small">Orbit</button>
+    <button id="birdBtn" class="small">Bird's Eye</button>
+  </div>
+
+  <label>Debug / Log</label>
+  <div id="log"></div>
+
+  <div style="margin-top:12px;font-size:12px;color:#9aa7bf">Catatan: ini prototype. Untuk model preset yang kuat ("powerful") kamu harus menyediakan URL .glb yang di-host (GitHub, S3, or static host). Kode ini juga menerima upload file lokal untuk tiap piece.</div>
+</div>
+
+  </div>  <!-- Dependencies: three (module), GLTFLoader, OrbitControls, chess.js (move validation) -->  <script type="module">
+  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
+  import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js';
+  import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js';
+  // chess.js (non-module) loaded later as global
+
+  // --- UI hooks ---
+  const canvasArea = document.getElementById('canvasArea');
+  const logEl = document.getElementById('log');
+  function log(s){ logEl.innerText = typeof s === 'string' ? s + '\n' + logEl.innerText : JSON.stringify(s) + '\n' + logEl.innerText }
+
+  // --- renderer / scene / camera ---
+  const renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(canvasArea.clientWidth, canvasArea.clientHeight);
+  canvasArea.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0b1220);
+
+  const camera = new THREE.PerspectiveCamera(45, canvasArea.clientWidth / canvasArea.clientHeight, 0.1, 200);
+  camera.position.set(0, 30, 30);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(0,0,0);
+  controls.update();
+
+  window.addEventListener('resize', ()=>{
+    renderer.setSize(canvasArea.clientWidth, canvasArea.clientHeight);
+    camera.aspect = canvasArea.clientWidth / canvasArea.clientHeight;
+    camera.updateProjectionMatrix();
+  });
+
+  // --- lighting ---
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x222244, 0.9));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.8); dl.position.set(10,20,10); scene.add(dl);
+
+  // --- board ---
+  const board = new THREE.Group();
+  const squareGeo = new THREE.BoxGeometry(1,0.1,1);
+  const matLight = new THREE.MeshStandardMaterial({color:0xf0d9b5});
+  const matDark = new THREE.MeshStandardMaterial({color:0xb58863});
+  for(let x=0;x<8;x++) for(let z=0;z<8;z++){
+    const m = new THREE.Mesh(squareGeo, ((x+z)%2===0)?matLight:matDark);
+    m.position.set(x-3.5, 0, z-3.5);
+    m.userData.coord = {x,z};
+    board.add(m);
+  }
+  scene.add(board);
+
+  // --- piece management ---
+  // We store one mesh per piece; default built-in simple geometry set for quick start.
+  const pieceModels = { // per lowercase letter (p,r,n,b,q,k) store THREE.Object3D prototype
+    p: createBuiltin('pawn', 0.4), r: createBuiltin('rook', 0.55), n: createBuiltin('knight', 0.6), b: createBuiltin('bishop', 0.6), q: createBuiltin('queen',0.7), k: createBuiltin('king',0.75)
+  };
+
+  function createBuiltin(name, scale){
+    const g = new THREE.Group();
+    const base = new THREE.CylinderGeometry(0.35*scale,0.35*scale,0.15,16);
+    const top = new THREE.SphereGeometry(0.22*scale,12,12);
+    const m = new THREE.Mesh(base, new THREE.MeshStandardMaterial({color:0xdddddd}));
+    const t = new THREE.Mesh(top, new THREE.MeshStandardMaterial({color:0xdddddd}));
+    m.position.y = 0.075; t.position.y = 0.45*scale;
+    g.add(m); g.add(t);
+    return g;
+  }
+
+  // clones for white/black and positions
+  const boardGroup = new THREE.Group();
+  scene.add(boardGroup);
+
+  // chess logic via chess.js (we'll load script below)
+  let Chess; // constructor
+  // We'll use global 'chess' instance for rules
+  let chessGame = null;
+
+  // mapping from square ('e4') to mesh
+  const squareToMesh = {};
+
+  function addPieceAt(square, pieceCode){
+    // pieceCode like 'P' or 'p' from FEN (uppercase white)
+    const file = square[0]; const rank = square[1];
+    const x = file.charCodeAt(0) - 'a'.charCodeAt(0);
+    const z = 8 - parseInt(rank);
+    const lower = pieceCode.toLowerCase();
+    const modelProto = pieceModels[lower];
+    if(!modelProto) return;
+    const mesh = modelProto.clone();
+    mesh.position.set(x-3.5, 0.15, z-3.5);
+    mesh.userData = {square, piece: pieceCode};
+    // color by case
+    mesh.traverse((c)=>{ if(c.isMesh) c.material = c.material.clone(); });
+    const color = (pieceCode === pieceCode.toUpperCase()) ? 0xffffff : 0x333333;
+    mesh.traverse((c)=>{ if(c.isMesh) c.material.color.setHex(color); });
+    boardGroup.add(mesh);
+    squareToMesh[square] = mesh;
+  }
+
+  function clearPieces(){
+    for(const k in squareToMesh) {
+      const m = squareToMesh[k]; if(m && m.parent) m.parent.remove(m);
+    }
+    Object.keys(squareToMesh).forEach(k=>delete squareToMesh[k]);
+  }
+
+  function loadPositionFromFEN(fen){
+    clearPieces();
+    chessGame.load(fen);
+    const boardArr = chessGame.board(); // 8x8
+    for(let r=0;r<8;r++){
+      for(let f=0;f<8;f++){
+        const p = boardArr[r][f];
+        if(p){
+          const file = String.fromCharCode('a'.charCodeAt(0) + f);
+          const rank = 8 - r;
+          const sq = file + rank;
+          const code = (p.color === 'w') ? p.type.toUpperCase() : p.type.toLowerCase();
+          addPieceAt(sq, code);
+        }
+      }
+    }
+    log('Position loaded. FEN: ' + chessGame.fen());
+  }
+
+  // init chess.js by loading CDN script then creating game
+  function initChessLib(cb){
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js';
+    s.onload = ()=>{ Chess = window.Chess; chessGame = new Chess(); cb && cb(); };
+    s.onerror = ()=>{ log('Gagal load chess.js dari CDN.'); };
+    document.head.appendChild(s);
+  }
+
+  initChessLib(()=>{
+    loadPositionFromFEN(chessGame.fen());
+  });
+
+  // --- interaction: raycast + drag-drop ---
+  const ray = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  let dragging = null; // {mesh, fromSquare}
+  let planeY = new THREE.Plane(new THREE.Vector3(0,1,0), 0);
+  let offset = new THREE.Vector3();
+
+  renderer.domElement.addEventListener('pointerdown', (ev)=>{
+    setMouse(ev);
+    ray.setFromCamera(mouse, camera);
+    const intersects = ray.intersectObjects(boardGroup.children, true);
+    if(intersects.length>0){
+      const picked = intersects[0].object;
+      const root = findRootPiece(picked);
+      if(root){
+        dragging = {mesh: root, from: root.userData.square};
+        // lift
+        root.position.y = 1.5;
+      }
+    }
+  });
+
+  renderer.domElement.addEventListener('pointermove', (ev)=>{
+    if(!dragging) return;
+    setMouse(ev);
+    ray.setFromCamera(mouse, camera);
+    const hit = ray.intersectObject(new THREE.Mesh(new THREE.PlaneGeometry(100,100), new THREE.MeshBasicMaterial({visible:false})), true);
+    // instead use plane
+    const intersection = new THREE.Vector3();
+    ray.ray.intersectPlane(planeY, intersection);
+    if(intersection){ dragging.mesh.position.x = intersection.x; dragging.mesh.position.z = intersection.z; }
+  });
+
+  renderer.domElement.addEventListener('pointerup', (ev)=>{
+    if(!dragging) return;
+    // compute target square
+    const x = Math.round(dragging.mesh.position.x + 3.5);
+    const z = Math.round(dragging.mesh.position.z + 3.5);
+    const file = String.fromCharCode('a'.charCodeAt(0) + x);
+    const rank = 8 - z;
+    const toSquare = file + rank;
+
+    const move = { from: dragging.from, to: toSquare, promotion: 'q' };
+    const result = chessGame.move(move);
+    if(result){
+      // apply move visually
+      const movedMesh = squareToMesh[dragging.from];
+      if(movedMesh && movedMesh.parent) movedMesh.parent.remove(movedMesh);
+      delete squareToMesh[dragging.from];
+      // if capture remove target
+      if(squareToMesh[toSquare]){ const cap = squareToMesh[toSquare]; if(cap && cap.parent) cap.parent.remove(cap); delete squareToMesh[toSquare]; }
+      // add moved piece to target
+      addPieceAt(toSquare, result.color === 'w' ? result.piece.toUpperCase() : result.piece.toLowerCase());
+      log('Move: ' + result.san + '   FEN: ' + chessGame.fen());
+    } else {
+      // illegal -> snap back
+      const original = squareToMesh[dragging.from];
+      if(original) original.position.set((dragging.from.charCodeAt(0)-'a'.charCodeAt(0))-3.5, 0.15, 8-parseInt(dragging.from[1]) -3.5);
+      log('Illegal move attempted: ' + dragging.from + ' -> ' + toSquare);
+    }
+
+    dragging = null;
+  });
+
+  function findRootPiece(obj){
+    let o = obj; while(o && o.parent && o.parent!==scene){ if(o.userData && o.userData.piece) return o; o = o.parent; } return null;
+  }
+
+  function setMouse(ev){
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
+  }
+
+  // --- model loading (GLTF) and model-switching system ---
+  const gltfLoader = new GLTFLoader();
+  // modelRegistry: per type ('p','r','n','b','q','k') store {scene,scale,yoffset}
+  const modelRegistry = {};
+
+  document.getElementById('uploadBtn').addEventListener('click', ()=>{
+    const fileInput = document.getElementById('fileInput');
+    const pieceType = document.getElementById('pieceType').value;
+    if(!fileInput.files.length){ alert('Pilih file .glb/.gltf terlebih dahulu'); return; }
+    const file = fileInput.files[0];
+    const url = URL.createObjectURL(file);
+    gltfLoader.load(url, gltf=>{
+      modelRegistry[pieceType] = {scene: gltf.scene, scale: parseFloat(document.getElementById('scaleInput').value)||1, y: parseFloat(document.getElementById('yOffsetInput').value)||0};
+      // apply transform to prototype clone
+      const proto = gltf.scene.clone(); proto.scale.setScalar(modelRegistry[pieceType].scale); proto.position.y = modelRegistry[pieceType].y;
+      pieceModels[pieceType] = proto;
+      log('Model for '+pieceType+' loaded from local file');
+      // reload current position to use new models
+      loadPositionFromFEN(chessGame.fen());
+    }, undefined, err=>{ log('Gagal load GLB: '+err); });
+  });
+
+  document.getElementById('applyTransform').addEventListener('click', ()=>{
+    const pieceType = document.getElementById('pieceType').value;
+    const s = parseFloat(document.getElementById('scaleInput').value) || 1;
+    const y = parseFloat(document.getElementById('yOffsetInput').value) || 0;
+    if(modelRegistry[pieceType]){ modelRegistry[pieceType].scale = s; modelRegistry[pieceType].y = y; pieceModels[pieceType].scale.setScalar(s); pieceModels[pieceType].position.y = y; loadPositionFromFEN(chessGame.fen()); log('Transform diterapkan ke '+pieceType); }
+    else { alert('Tipe belum punya model custom. Unggah dulu.'); }
+  });
+
+  // presets selection (placeholder behavior) — real powerful presets require hosting .glb files
+  document.getElementById('presetSelect').addEventListener('change', (e)=>{
+    const v = e.target.value;
+    if(v==='none'){ for(const k in pieceModels) pieceModels[k] = createBuiltin(k,0.5); loadPositionFromFEN(chessGame.fen()); log('Preset: built-in low-poly'); }
+    else { alert('Preset placeholder — untuk preset nyata, sediakan URL .glb per piece atau upload file.'); }
+  });
+
+  // reset/undo
+  document.getElementById('resetBtn').addEventListener('click', ()=>{ chessGame.reset(); loadPositionFromFEN(chessGame.fen()); });
+  document.getElementById('undoBtn').addEventListener('click', ()=>{ chessGame.undo(); loadPositionFromFEN(chessGame.fen()); });
+
+  document.getElementById('orbitBtn').addEventListener('click', ()=>{ controls.enabled = true; camera.position.set(0,30,30); controls.update(); });
+  document.getElementById('birdBtn').addEventListener('click', ()=>{ controls.enabled = false; camera.position.set(0,50,0.1); camera.lookAt(0,0,0); });
+
+  // --- initial animation loop ---
+  function animate(){ requestAnimationFrame(animate); renderer.render(scene, camera); }
+  animate();
+
+  // expose helper for debugging
+  window._3dChess = { scene, chessGame, addPieceAt, loadPositionFromFEN };
+
+  </script></body>
+</html>

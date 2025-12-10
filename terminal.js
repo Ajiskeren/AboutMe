@@ -1,13 +1,14 @@
-/* Robust terminal script — safer DOM checks + forced fallback hide
-   Paste entire file to replace existing terminal.js
+/* AXIS TERMINAL V3.0 — GEMINI API INTEGRATED (FIXED)
+   Code by: M. Aziz Jaya & Sarah (Assistant)
+   Paste this into your terminal.js file
 */
 
 (function () {
-  // small helper
+  // --- UTILITIES ---
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const safe = (id) => document.getElementById(id);
 
-  // Query elements safely
+  // --- DOM ELEMENTS ---
   const intro = safe("intro");
   const introLinesEl = safe("intro-lines");
   const introCursor = safe("intro-cursor");
@@ -20,22 +21,14 @@
   const termInput = safe("termInputOverlay");
   const promptRowOverlay = safe("promptRowOverlay");
   const termBodyOverlay = safe("termBodyOverlay");
-
   const main = safe("main");
 
+  // --- AUDIO ---
   const glitchSound = safe("glitchSound");
   const typeSound = safe("typeSound");
   const errBeep = safe("errBeep");
 
-  // If required DOM nodes missing, bail with console hint
-  if (!intro || !introLinesEl || !main) {
-    console.error(
-      "Terminal init failed: missing required DOM elements. Check IDs: intro, intro-lines, main."
-    );
-    return;
-  }
-
-  // Boot lines (example)
+  // --- BOOT SEQUENCE ---
   const bootLines = [
     "[ OK ] Starting kernel...",
     "[ OK ] Loading drivers...",
@@ -43,611 +36,383 @@
     "[ OK ] Initializing udev...",
     "[FAILED] AXIS_NET: interface timeout",
     "[ OK ] AXIS_NET: recovered",
-    "[FAILED] AXIS_DB: connection retry 1",
-    "[FAILED] AXIS_DB: connection retry 2",
-    "[ OK ] AXIS_DB connected (ro)",
     "[ OK ] Loading services...",
-    "[FAILED] AXIS_SEC: key mismatch",
-    "[ OK ] AXIS_SEC regenerated key",
-    "[ WARN ] CPU microcode outdated",
-    "[ OK ] Applying microcode patch",
-    "[ OK ] AXIS_ModuleLoader ready",
-    "[FAILED] AXIS_X: checksum invalid",
-    "[ OK ] Ignoring non-critical module",
+    "[ OK ] AXIS_AI_CORE: Neural Network connected",
     "[ OK ] AXIS scheduler online",
-    "[ OK ] AXIS watchdog started",
     ">>> AXIS host: axis",
     ">>> System ready",
   ];
 
-  // TIMING
-  const TOTAL = 2000; // total intro time target
+  // --- CONFIG ---
+  const TOTAL = 2000;
   const GLITCH = 350;
-  const TYPING_TIME = Math.max(100, TOTAL - GLITCH);
-  const PER_LINE = TYPING_TIME / Math.max(1, bootLines.length);
+  const PER_LINE = (TOTAL - GLITCH) / bootLines.length;
 
-  /* ---------- helpers ---------- */
-  function appendLineTo(el, text) {
+  /* ---------- HELPERS ---------- */
+  function appendLineTo(el, text, isAi = false) {
     if (!el) return;
     const node = document.createElement("div");
-    const lower = String(text).toLowerCase();
-    if (
-      text.includes("[FAILED]") ||
-      lower.includes("error") ||
-      lower.includes("[err]")
-    ) {
-      node.classList.add("error");
-      node.classList.add("blink");
+
+    // Formatting sederhana
+    let formatted = text
+      .replace(
+        /\*\*(.*?)\*\*/g,
+        '<span style="color:#fff; font-weight:bold">$1</span>'
+      ) // Bold
+      .replace(/`([^`]+)`/g, '<span style="color:var(--accent)">$1</span>'); // Code
+
+    // Style khusus Error
+    if (text.includes("[FAILED]") || text.toLowerCase().includes("error")) {
+      node.classList.add("error", "blink");
     }
-    node.textContent = text;
+
+    // Style khusus AI
+    if (isAi) {
+      node.style.color = "#a6e22e";
+      node.style.textShadow = "0 0 5px rgba(166, 226, 46, 0.5)";
+      formatted = "🤖 AI: " + formatted;
+    }
+
+    node.innerHTML = formatted;
     el.appendChild(node);
   }
+
   function scrollToBottom(el) {
     if (!el) return;
-    setTimeout(() => (el.scrollTop = el.scrollHeight), 8);
+    setTimeout(() => (el.scrollTop = el.scrollHeight), 10);
   }
+
   function playSound(el) {
-    if (!el) return;
-    try {
+    if (el) {
       el.currentTime = 0;
       el.play().catch(() => {});
-    } catch (e) {}
-  }
-  function flashOverlayOn(el, duration = 600) {
-    if (!el) return;
-    const fx = document.createElement("div");
-    fx.className = "glitch-flash";
-    el.appendChild(fx);
-    setTimeout(() => {
-      try {
-        el.removeChild(fx);
-      } catch (e) {}
-    }, duration + 40);
+    }
   }
 
-  /* ---------- RUN INTRO (safe) ---------- */
+  // Helper untuk efek ngetik satu-satu (Typewriter Effect)
+  async function typeWriterEffect(prefix, text) {
+    const node = document.createElement("div");
+    node.style.color = "#00ffcc"; // Warna Cyan
+    node.style.marginBottom = "8px";
+    node.style.whiteSpace = "pre-wrap";
+    linesOverlay.appendChild(node);
+
+    // Bersihkan format markdown bold (**) jadi HTML bold
+    let cleanText = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+
+    // Loop ngetik (pakai innerHTML hati-hati, kita simplifikasi biar aman)
+    // Kita append char by char, tapi kalau ada tag HTML kita langsung render
+    // Untuk simplifikasi biar gak bug di tag HTML, kita ketik teks biasa aja dulu
+    // atau langsung render full kalau teksnya kompleks.
+
+    // Versi Simple & Aman:
+    node.innerHTML = `<strong>${prefix}</strong>`; // Prefix dulu
+
+    const contentSpan = document.createElement("span");
+    node.appendChild(contentSpan);
+
+    // Hapus tag HTML buat efek ketik biar gak rusak (atau render langsung)
+    // Di sini kita render langsung chunk demi chunk biar cepet
+    let i = 0;
+    const speed = 10; // Kecepatan ngetik ms
+
+    // Kita pakai trick: render text full tapi hide, terus reveal?
+    // Atau ketik manual plain text. Gemini suka ngasih markdown.
+    // Kita pakai plain text typing aja biar kerasa hacker-nya.
+
+    const plainText = text.replace(/\*\*/g, ""); // Hapus bintang markdown
+
+    while (i < plainText.length) {
+      contentSpan.textContent += plainText.charAt(i);
+      i++;
+      scrollToBottom(termBodyOverlay);
+      if (i % 2 === 0) await sleep(speed); // Delay tiap 2 huruf
+    }
+  }
+
+  /* ---------- AI LOGIC (GEMINI INTEGRATION) ---------- */
+  async function processAiResponse(query) {
+    if (!query) return;
+
+    // 1. Tampilkan status loading
+    const loadingId = "load_" + Date.now();
+    appendLineTo(
+      linesOverlay,
+      `<span id="${loadingId}" style="color:yellow">[ CONNECTING TO NEURAL NET... ]</span>`
+    );
+    scrollToBottom(termBodyOverlay);
+
+    // Matikan input biar user gak spam
+    if (termInput) termInput.disabled = true;
+
+    try {
+      // 2. Kirim pesan ke backend Vercel (/api/chat)
+      const req = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: query }),
+      });
+
+      const res = await req.json();
+
+      // Hapus tulisan loading
+      const loadEl = document.getElementById(loadingId);
+      if (loadEl) loadEl.remove();
+
+      if (res.error) {
+        appendLineTo(linesOverlay, `[ERROR] ${res.error}`);
+        appendLineTo(
+          linesOverlay,
+          `(Info: Pastikan server backend berjalan / Vercel CLI aktif)`
+        );
+      } else {
+        // 3. Efek mengetik untuk jawaban Gemini
+        await typeWriterEffect("🤖 GEMINI: ", res.reply);
+      }
+    } catch (err) {
+      const loadEl = document.getElementById(loadingId);
+      if (loadEl) loadEl.remove();
+      console.error(err);
+      appendLineTo(linesOverlay, `[FATAL ERROR] Gagal menghubungi Server AI.`);
+      appendLineTo(
+        linesOverlay,
+        `Tip: Fitur ini butuh Backend (Vercel). Cek console.`
+      );
+    } finally {
+      // Nyalakan input lagi
+      if (termInput) {
+        termInput.disabled = false;
+        termInput.focus();
+      }
+      scrollToBottom(termBodyOverlay);
+    }
+  }
+
+  /* ---------- MAIN INTRO ---------- */
   (async function runIntro() {
     try {
-      // small initial pause
-      await sleep(60);
-
-      // Clear intro area first (in case)
+      await sleep(100);
       introLinesEl.innerHTML = "";
-
-      // Fast print each line, spacing to fit PER_LINE
-      for (let i = 0; i < bootLines.length; i++) {
-        appendLineTo(introLinesEl, bootLines[i]);
+      for (let line of bootLines) {
+        appendLineTo(introLinesEl, line);
         scrollToBottom(introLinesEl);
-        await sleep(Math.max(0, Math.floor(PER_LINE)));
+        await sleep(PER_LINE);
       }
-
-      // show prompt and short placeholder
       if (introCursor) introCursor.style.visibility = "visible";
-      if (introInputPlaceholder) introInputPlaceholder.textContent = "uname -a";
+      if (introInputPlaceholder)
+        introInputPlaceholder.textContent = "init_portfolio.sh";
 
-      // glitch visual + sound
       const termBody = intro.querySelector(".term-body") || intro;
-      flashOverlayOn(termBody, GLITCH);
       intro.classList.add("glitch");
       playSound(glitchSound);
 
-      // After glitch, hide intro and show main
       setTimeout(() => {
-        try {
-          intro.style.display = "none";
-        } catch (e) {}
-        try {
-          main.classList.add("show");
-          main.setAttribute("aria-hidden", "false");
-        } catch (e) {}
+        intro.style.display = "none";
+        main.classList.remove("main-hidden");
+        main.classList.add("show");
       }, GLITCH);
-    } catch (err) {
-      // If anything fails, ensure we hide intro eventually so site is accessible
-      console.error("runIntro error:", err);
-      setTimeout(() => {
-        try {
-          intro.style.display = "none";
-        } catch (e) {}
-        try {
-          main.classList.add("show");
-          main.setAttribute("aria-hidden", "false");
-        } catch (e) {}
-      }, TOTAL + 200);
+    } catch (e) {
+      console.log("Intro skipped");
     }
   })();
 
-  // Force-hide fallback in case runIntro crashes early (guarantee not stuck)
-  setTimeout(() => {
-    if (intro && getComputedStyle(intro).display !== "none") {
-      console.warn("Forcing hide intro after fallback timeout.");
-      try {
-        intro.style.display = "none";
-      } catch (e) {}
-      try {
-        main.classList.add("show");
-        main.setAttribute("aria-hidden", "false");
-      } catch (e) {}
-    }
-  }, TOTAL + 2000); // extra safety timeout (TOTAL + 2s)
-
-  /* ---------- Interactive overlay logic (safe wiring) ---------- */
-  // minimal state
+  /* ---------- INTERACTIVE TERMINAL ---------- */
   const state = {
-    cwd: "/home/axis",
     history: [],
     historyIndex: -1,
-    files: {
-      "/": ["home", "var", "etc"],
-      "/home": ["axis"],
-      "/home/axis": ["readme.txt"],
-    },
-    promptText: "axis@linux:~$",
+    cwd: "~/projects/portfolio",
+    promptText: "axis@dev:~$",
   };
 
   const commands = {
     help() {
-      safePrint([
-        "Available: help, music-help, clear, about, axis, axis --info, ls, cd, pwd, open, play, hack, echo, run, exit",
-      ]);
+      appendLineTo(
+        linesOverlay,
+        `
+      <div style="color:#ddd">
+        AVAILABLE COMMANDS:
+        -------------------
+        <span style="color:yellow">ai [teks]</span>    → Chat dengan Gemini AI
+        <span style="color:yellow">play [judul]</span> → Putar lagu
+        <span style="color:yellow">clear</span>        → Bersihkan layar
+        <span style="color:yellow">about</span>        → Info developer
+        <span style="color:yellow">contact</span>      → Info kontak
+        <span style="color:yellow">exit</span>         → Tutup terminal
+      </div>
+      `
+      );
     },
+
+    // COMMAND AI
+    ai(args) {
+      if (!args.length) {
+        appendLineTo(linesOverlay, "Usage: ai <pertanyaan>");
+        return;
+      }
+      processAiResponse(args.join(" "));
+    },
+
+    // Alias
+    chat(args) {
+      this.ai(args);
+    },
+    tanya(args) {
+      this.ai(args);
+    },
+
+    // Command Lain
     clear() {
-      if (linesOverlay) linesOverlay.innerHTML = "";
-      if (termBodyOverlay) scrollToBottom(termBodyOverlay);
+      linesOverlay.innerHTML = "";
     },
     about() {
-      safePrint(["AXIS Web Terminal", "Author: (you)", "Version: 1.0"]);
+      appendLineTo(linesOverlay, "M. Aziz Jaya | 15 y.o | Fullstack Wannabe");
     },
-    axis(args) {
-      if (args && args[0] === "--info") {
-        commands["axis --info"]();
-        return;
-      }
-      safePrint(["AXIS: commands: --info, status"]);
-    },
-    "axis --info"() {
-      safePrint(["Hostname: axis", "Services: 42", "Uptime: simulated"]);
-    },
-    // ============================
-    // 🎵 MUSIC TERMINAL COMMANDS
-    // ============================
-
-    "music-help": function () {
-      safePrint([
-        "🎵 MUSIC COMMAND LIST",
-        "--------------------------------",
-        "play <index|title>   → Putar lagu",
-        "pause                → Pause lagu",
-        "resume               → Lanjutkan lagu",
-        "next                 → Lagu berikutnya",
-        "prev                 → Lagu sebelumnya",
-        "seek <detik>         → Lompat ke waktu",
-        "volume <0–1>         → Atur volume",
-        "repeat <on|off>      → Mode repeat",
-        "random               → Mode acak",
-        "now                  → Info lagu sekarang",
-        "list                 → Daftar semua lagu",
-        "--------------------------------",
-        "Gunakan: run <function> untuk fungsi internal",
-      ]);
+    contact() {
+      appendLineTo(linesOverlay, "WA: 089508883568 | IG: @axis_pp_ra");
     },
 
-    // ▶️ PLAY (play index / play title)
+    // Music Player
     play(args) {
-      if (!args || args.length === 0) {
-        safePrint(["Usage: play <index|title>"]);
+      if (typeof tracks === "undefined") {
+        appendLineTo(linesOverlay, "[ERR] Audio driver not loaded.");
         return;
       }
-
       let query = args.join(" ").toLowerCase();
 
-      // Jika angka → pakai index
-      let index = parseInt(query);
-      if (!isNaN(index)) {
-        if (tracks[index]) {
-          loadTrack(index);
-          safePrint([`Playing: ${tracks[index].title}`]);
-        } else {
-          safePrint(["Track index tidak ditemukan"]);
-        }
+      if (!query) {
+        if (typeof audio !== "undefined") audio.play();
+        appendLineTo(linesOverlay, "Resuming audio stream...");
         return;
       }
 
-      // Jika string → cari title
-      let found = tracks.findIndex((t) =>
+      let foundIndex = tracks.findIndex((t) =>
         t.title.toLowerCase().includes(query)
       );
-
-      if (found !== -1) {
-        loadTrack(found);
-        safePrint([`Playing: ${tracks[found].title}`]);
+      if (foundIndex !== -1 && typeof loadTrack === "function") {
+        loadTrack(foundIndex);
+        audio.play();
+        appendLineTo(linesOverlay, `Now Playing: ${tracks[foundIndex].title}`);
       } else {
-        safePrint(["Lagu tidak ditemukan"]);
+        appendLineTo(linesOverlay, `[ERR] Song "${query}" not found.`);
       }
     },
-
-    // ⏸ PAUSE
-    pause() {
-      audio.pause();
-      safePrint(["Paused"]);
+    stop() {
+      if (typeof audio !== "undefined") audio.pause();
+      appendLineTo(linesOverlay, "Audio paused.");
     },
 
-    // ▶️ RESUME
-    resume() {
-      audio.play();
-      safePrint(["Resumed"]);
-    },
-
-    // ⏭ NEXT
-    next() {
-      currentTrack = (currentTrack + 1) % tracks.length;
-      loadTrack(currentTrack);
-      safePrint([`Next: ${tracks[currentTrack].title}`]);
-    },
-
-    // ⏮ PREV
-    prev() {
-      currentTrack = (currentTrack - 1 + tracks.length) % tracks.length;
-      loadTrack(currentTrack);
-      safePrint([`Previous: ${tracks[currentTrack].title}`]);
-    },
-
-    // ⏩ SEEK detik
-    seek(args) {
-      if (!args || isNaN(parseFloat(args[0]))) {
-        safePrint(["Usage: seek <seconds>"]);
-        return;
-      }
-
-      audio.currentTime = parseFloat(args[0]);
-      safePrint([`Seek → ${audio.currentTime.toFixed(1)}s`]);
-    },
-
-    // 🔊 VOLUME
-    volume(args) {
-      if (!args || isNaN(parseFloat(args[0]))) {
-        safePrint(["Usage: volume <0–1>"]);
-        return;
-      }
-
-      let v = parseFloat(args[0]);
-
-      if (v < 0 || v > 1) {
-        safePrint(["Volume must be between 0 and 1"]);
-        return;
-      }
-
-      audio.volume = v;
-      safePrint([`Volume: ${(v * 100).toFixed(0)}%`]);
-    },
-
-    // 🔁 REPEAT
-    repeat(args) {
-      if (!args || (args[0] !== "on" && args[0] !== "off")) {
-        safePrint(["Usage: repeat <on|off>"]);
-        return;
-      }
-
-      audio.loop = args[0] === "on";
-
-      safePrint([`Repeat: ${audio.loop ? "ON" : "OFF"}`]);
-    },
-
-    // 🔀 RANDOM PLAY
-    random() {
-      let r = Math.floor(Math.random() * tracks.length);
-      loadTrack(r);
-      safePrint([`Random: ${tracks[r].title}`]);
-    },
-
-    // ℹ️ INFO LAGU SEKARANG
-    now() {
-      const t = tracks[currentTrack];
-      safePrint([
-        "🎵 NOW PLAYING",
-        "-------------------------",
-        `Title : ${t.title}`,
-        `Artist: ${t.artist}`,
-        `Time  : ${audio.currentTime.toFixed(1)}s / ${
-          audio.duration ? audio.duration.toFixed(1) : "?"
-        }s`,
-      ]);
-    },
-
-    // 📜 LIST TRACKS
-    list() {
-      safePrint(["🎵 Track List:"]);
-      tracks.forEach((t, i) => safePrint([`${i}. ${t.title}`]));
-    },
-    ls(args) {
-      const p = args && args[0] ? resolvePath(args[0]) : state.cwd;
-      const list = state.files[p] || [];
-      safePrint(list.length ? [list.join("  ")] : [""]);
-    },
-    pwd() {
-      safePrint([state.cwd]);
-    },
-    cd(args) {
-      if (!args || !args[0] || args[0] === "~") {
-        state.cwd = "/home/axis";
-        safePrint([state.cwd]);
-        return;
-      }
-      const t = resolvePath(args[0]);
-      if (state.files[t]) {
-        state.cwd = t;
-        safePrint([state.cwd]);
-      } else {
-        playSound(errBeep);
-        safePrint([`cd: ${args[0]}: No such file or directory`]);
-      }
-    },
-    open(args) {
-      const t = (args && args[0]) || "";
-      if (!t) {
-        safePrint(["Usage: open <url|home>"]);
-        return;
-      }
-      if (t === "home") {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        safePrint(["Opened: home"]);
-        return;
-      }
-      if (/^https?:\/\//.test(t)) {
-        safePrint([`Opening: ${t}`]);
-        setTimeout(() => window.open(t, "_blank"), 150);
-        return;
-      }
-      safePrint([`Open: Unknown target "${t}"`]);
-    },
-    play(args) {
-      const what = (args && args.join(" ")) || "";
-
-      // Efek lama tetap
-      if (what === "glitch") {
-        playSound(glitchSound);
-        safePrint(["Played: glitch"]);
-        return;
-      }
-      if (what === "type") {
-        playSound(typeSound);
-        safePrint(["Played: type"]);
-        return;
-      }
-
-      // Cari lagu berdasarkan judul (case-insensitive)
-      const index = tracks.findIndex(
-        (t) => t.title.toLowerCase() === what.toLowerCase()
-      );
-
-      if (index !== -1) {
-        safePrint([
-          `Loading: ${tracks[index].title} - ${tracks[index].artist}`,
-        ]);
-        loadTrack(index); // 🔥 pakai player utama
-        return;
-      }
-
-      // Tidak ditemukan
-      safePrint([
-        `Lagu "${what}" tidak ditemukan.`,
-        `Gunakan: play <judul lagu>`,
-      ]);
-    },
-
-    run(args) {
-      const fn = args && args[0];
-
-      if (!fn) {
-        safePrint(["Usage: run <functionName>"]);
-        return;
-      }
-
-      // Cek apakah fungsi ada di window / global scope
-      const fnRef = window[fn];
-
-      if (typeof fnRef === "function") {
-        try {
-          fnRef(); // jalankan fungsi
-          safePrint([`Executed: ${fn}()`]);
-        } catch (e) {
-          safePrint([`Error while running ${fn}(): ${e.message}`]);
-        }
-      } else {
-        safePrint([`Function "${fn}" not found.`]);
-      }
-    },
-    hack() {
-      safePrint(["Initiating hack sequence..."]);
-      const seq = [
-        "connecting...",
-        "bypassing...",
-        "[FAILED] attempt",
-        "switching...",
-        "done (simulated)",
-      ];
-      let i = 0;
-      const iv = setInterval(() => {
-        if (i < seq.length) {
-          if (linesOverlay) appendLineTo(linesOverlay, seq[i]);
-          i++;
-          scrollToBottom(termBodyOverlay);
-        } else clearInterval(iv);
-      }, 90);
-    },
-    echo(args) {
-      safePrint([args.join(" ")]);
-    },
     exit() {
       closeOverlay();
     },
   };
 
-  function safePrint(arr) {
-    if (!linesOverlay) return;
-    arr.forEach((t) => appendLineTo(linesOverlay, t));
-    scrollToBottom(termBodyOverlay);
-  }
-
-  function resolvePath(p) {
-    if (!p) return state.cwd;
-    if (p.startsWith("/")) return p;
-    if (p === "~") return "/home/axis";
-    if (state.files[state.cwd + "/" + p]) return state.cwd + "/" + p;
-    if (state.files["/" + p]) return "/" + p;
-    return "/";
-  }
-
-  function handleTabCompletion(current) {
-    if (!current) return current;
-    const all = Object.keys(commands);
-    const parts = current.trim().split(/\s+/);
-    const last = parts.pop() || "";
-    const candidates = all.filter(
-      (c) => c.startsWith(last) || c.startsWith(parts[0] + " " + last)
-    );
-    if (candidates.length === 1) {
-      parts.push(candidates[0]);
-      return parts.join(" ") + " ";
-    }
-    if (candidates.length > 1) {
-      safePrint(["Possible: " + candidates.join("  ")]);
-      return current;
-    }
-    return current;
-  }
-
   function runCommand(raw) {
-    if (!raw) return;
-    const parts = raw.split(/\s+/);
-    const cmd = (parts.shift() || "").toLowerCase();
-    const args = parts;
-    const multi = cmd + (args[0] ? " " + args[0] : "");
-    if (commands[multi]) {
-      commands[multi](args.slice(1));
-      return;
-    }
+    const parts = raw.trim().split(/\s+/);
+    const cmd = parts.shift().toLowerCase();
+
     if (commands[cmd]) {
-      try {
-        commands[cmd](args);
-      } catch (e) {
-        playSound(errBeep);
-        if (linesOverlay) appendLineTo(linesOverlay, "Error: " + e.message);
-      }
-      return;
+      commands[cmd](parts);
+    } else {
+      playSound(errBeep);
+      appendLineTo(linesOverlay, `bash: ${cmd}: command not found`);
     }
-    playSound(errBeep);
-    if (linesOverlay) appendLineTo(linesOverlay, `${cmd}: command not found`);
-    scrollToBottom(termBodyOverlay);
   }
 
-  /* ---------- Overlay open/close wiring (guarded) ---------- */
+  /* ---------- EVENT LISTENERS ---------- */
   function openOverlay() {
-    if (!overlay) return;
     overlay.classList.remove("overlay-hidden");
     overlay.style.display = "flex";
-    overlay.setAttribute("aria-hidden", "false");
-    if (linesOverlay) linesOverlay.innerHTML = "";
-    safePrint(["Interactive terminal. Type 'help' for commands."]);
-    if (promptRowOverlay) promptRowOverlay.style.display = "flex";
-    if (termInput) {
-      termInput.value = "";
-      termInput.focus();
-    }
+    termInput.focus();
   }
+
   function closeOverlay() {
-    if (!overlay) return;
     overlay.classList.add("overlay-hidden");
     overlay.style.display = "none";
-    overlay.setAttribute("aria-hidden", "true");
-    if (termInput) termInput.blur();
   }
 
-  // attach toggle (if present)
-  if (toggleBtn) {
-    toggleBtn.addEventListener("click", () => {
-      if (!overlay) return;
-      if (overlay.classList.contains("overlay-hidden")) openOverlay();
+  if (toggleBtn)
+    toggleBtn.onclick = () => {
+      if (
+        overlay.style.display === "none" ||
+        overlay.classList.contains("overlay-hidden")
+      )
+        openOverlay();
       else closeOverlay();
-    });
-  } else {
-    console.warn("terminalToggle button not found; overlay toggle disabled.");
-  }
-
-  if (closeBtn) closeBtn.addEventListener("click", closeOverlay);
+    };
+  if (closeBtn) closeBtn.onclick = closeOverlay;
 
   window.addEventListener("keydown", (e) => {
-    if (
-      e.key === "Escape" &&
-      overlay &&
-      !overlay.classList.contains("overlay-hidden")
-    )
-      closeOverlay();
-    // optional tilde (~) hotkey to toggle if overlay exists and focus not in input
-    if (
-      e.key === "`" &&
-      document.activeElement &&
-      document.activeElement.tagName !== "INPUT"
-    ) {
-      if (!overlay) return;
+    if (e.key === "`") {
       if (overlay.classList.contains("overlay-hidden")) openOverlay();
       else closeOverlay();
     }
   });
 
-  // input listeners (guarded)
   if (termInput) {
     termInput.addEventListener("keydown", (e) => {
-      const val = termInput.value;
       if (e.key === "Enter") {
-        e.preventDefault();
-        const raw = val.trim();
-        if (linesOverlay)
-          appendLineTo(linesOverlay, state.promptText + " " + raw);
-        state.history.push(raw);
+        const val = termInput.value;
+        if (!val) return;
+
+        appendLineTo(linesOverlay, `${state.promptText} ${val}`);
+        state.history.push(val);
         state.historyIndex = state.history.length;
-        runCommand(raw);
+
+        runCommand(val);
         termInput.value = "";
         scrollToBottom(termBodyOverlay);
       } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        if (state.history.length === 0) return;
-        state.historyIndex = Math.max(
-          0,
-          (state.historyIndex === -1
-            ? state.history.length
-            : state.historyIndex) - 1
-        );
-        termInput.value = state.history[state.historyIndex] || "";
-      } else if (e.key === "ArrowDown") {
-        e.preventDefault();
-        if (state.history.length === 0) return;
-        state.historyIndex = Math.min(
-          state.history.length,
-          state.historyIndex + 1
-        );
-        termInput.value = state.history[state.historyIndex] || "";
-      } else if (e.key === "Tab") {
-        e.preventDefault();
-        termInput.value = handleTabCompletion(val);
-      } else {
-        // optionally play typing sound (non-blocking)
-        playSound(typeSound);
+        // Fitur history up
+        if (state.historyIndex > 0) {
+          state.historyIndex--;
+          termInput.value = state.history[state.historyIndex];
+        }
       }
     });
-    // click term body to focus input
-    if (termBodyOverlay)
-      termBodyOverlay.addEventListener("click", () => termInput.focus());
-  } else {
-    console.warn("termInputOverlay not found; interactive input disabled.");
+    termBodyOverlay.addEventListener("click", () => termInput.focus());
   }
 
-  // expose for debugging
-  window._axisTerminal = {
-    openOverlay,
-    closeOverlay,
-    appendLineTo,
-    safePrint: safePrint,
-    state,
-    commands,
-  };
+  /* --- VIRTUAL KEYBOARD LOGIC (Tambahkan di dalam IIFE terminal.js) --- */
+  const keyboard = document.getElementById("retroKeyboard");
+
+  if (keyboard && termInput) {
+    // Bunyi ketikan khusus keyboard layar
+    const clickSound = new Audio("assets/audio/type-click.mp3"); // Pastikan path audionya bener ya
+
+    keyboard.addEventListener("click", (e) => {
+      // Cek apakah yang diklik itu tombol
+      if (e.target.classList.contains("key")) {
+        const key = e.target.getAttribute("data-key");
+
+        // Mainkan suara (Opsional, biar keren)
+        // clickSound.currentTime = 0;
+        // clickSound.play().catch(()=>{});
+
+        // Efek visual getar
+        termInput.focus();
+
+        if (key === "enter") {
+          // Simulasi tekan Enter beneran
+          const event = new KeyboardEvent("keydown", {
+            key: "Enter",
+            code: "Enter",
+            bubbles: true,
+          });
+          termInput.dispatchEvent(event);
+        } else if (key === "backspace") {
+          // Hapus 1 huruf belakang
+          termInput.value = termInput.value.slice(0, -1);
+        } else if (key === "clear") {
+          // Hapus semua
+          termInput.value = "";
+        } else {
+          // Ngetik huruf biasa
+          termInput.value += key;
+        }
+      }
+    });
+
+    // Sembunyikan keyboard kalau di Desktop (Opsional, kalau mau cuma di HP)
+    // if (window.innerWidth > 768) keyboard.style.display = 'none';
+  }
 })();

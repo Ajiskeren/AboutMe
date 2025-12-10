@@ -33,16 +33,17 @@ function readMore() {
   const more = document.getElementById("more");
   const btn = document.getElementById("btn");
 
-  const collapsed = more.classList.contains("collapsed");
-
-  if (collapsed) {
-    dots.style.display = "none";
-    more.classList.remove("collapsed");
-    btn.textContent = "Sembunyikan";
+  // Cek apakah sedang tersembunyi (punya class collapsed)
+  if (more.classList.contains("collapsed")) {
+    // AKSI: MUNCULKAN TEKS
+    dots.style.display = "none"; // Sembunyikan titik-titik
+    more.classList.remove("collapsed"); // Hapus class hidden
+    btn.textContent = "Read Less"; // Ubah teks tombol
   } else {
-    dots.style.display = "inline";
-    more.classList.add("collapsed");
-    btn.textContent = "Baca Selengkapnya";
+    // AKSI: SEMBUNYIKAN TEKS
+    dots.style.display = "inline"; // Munculkan titik-titik
+    more.classList.add("collapsed"); // Tambah class hidden
+    btn.textContent = "Read More"; // Balikin teks tombol
   }
 }
 
@@ -308,7 +309,33 @@ function fadeIn(audio, duration = fadeDuration) {
   }, 50);
 }
 
-// ======= loadTrack (panggil ini saat memilih lagu)
+// Fungsi Helper: Ubah Jempol Slider jadi Emoji
+function setSliderEmoji(emoji) {
+  // Kalau di data tracks tidak ada emoji, default ke not balok 🎵
+  const icon = emoji || "🎵";
+
+  // Bikin gambar SVG dari emoji
+  const svg = `
+    <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+      <text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-size='24'>${icon}</text>
+    </svg>
+  `.trim();
+
+  const encodedSvg = encodeURIComponent(svg);
+  const dataUrl = `url("data:image/svg+xml;utf8,${encodedSvg}")`;
+
+  // Kirim ke CSS Variable
+  document.documentElement.style.setProperty("--thumb-emoji", dataUrl);
+}
+
+function updateSliderGradient() {
+  if (!seek.max) return;
+  const val = (seek.value / seek.max) * 100;
+  // Warna kiri: activeColor, Warna kanan: abu-abu
+  seek.style.background = `linear-gradient(90deg, ${activeColor} ${val}%, #d0d0d0 ${val}%)`;
+}
+
+// ======= loadTrack (Final Version)
 function loadTrack(index) {
   currentTrack = index;
   const track = tracks[currentTrack];
@@ -316,19 +343,31 @@ function loadTrack(index) {
 
   isFading = false; // reset
 
-  // set audio & text
+  // === 🔥 UPDATE EMOJI & WARNA SLIDER ===
+  // 1. Set Emoji
+  setSliderEmoji(track.emoji);
+
+  // 2. Set Warna (Ambil dari tracks, kalau gak ada pake default)
+  activeColor = track.color || "#00ffcc";
+
+  // 3. Update CSS Variable (Untuk Border Visualizer & Shadow)
+  document.documentElement.style.setProperty("--warna-utama", activeColor);
+
+  // 4. Update Slider Gradient Sekarang Juga
+  updateSliderGradient();
+
+  // === SET AUDIO & TEXT ===
   audio.src = track.src;
   title.textContent = track.title || "";
   artist.textContent = track.artist || "";
 
-  // set image
-  cover.src = track.cover || "";
-  coverImg.src = track.cover || "";
+  // === SET IMAGE ===
+  const coverUrl = track.cover || "";
+  cover.src = coverUrl;
+  coverImg.src = coverUrl;
+  coverMain.src = coverUrl;
 
-  cover.src = track.cover || "";
-  coverMain.src = track.cover || "";
-
-  // set video jika ada
+  // === SET VIDEO COVER ===
   if (track.videoCover) {
     if (videoCover.getAttribute("src") !== track.videoCover) {
       videoCover.setAttribute("src", track.videoCover);
@@ -336,7 +375,6 @@ function loadTrack(index) {
         videoCover.load();
       } catch (e) {}
     }
-
     showVideo = true;
     showVideoCover();
   } else {
@@ -344,16 +382,14 @@ function loadTrack(index) {
     showImageCover();
   }
 
-  // load lirik
+  // === EXTRAS ===
   handleLyrics(track.src);
+  highlightPopupPlaylist();
 
-  // highlight playlist + autoplay
-  highlightPopupPlaylist(); // khusus popup
-
+  // Play
   audio.play().catch((e) => console.warn("audio play:", e));
-  playBtn.textContent = "ツ";
+  playBtn.textContent = "ツ"; // Icon custom kamu
 
-  // 🔥 Fade in saat lagu baru mulai
   fadeIn(audio);
 }
 
@@ -406,15 +442,19 @@ audio.addEventListener("timeupdate", () => {
 });
 
 // === Update warna progress slider ===
+// Default warna (biru) jika lagu tidak punya data warna
+let activeColor = "#4facfe";
+
+// === UPDATE FUNGSI SLIDER COLOR ===
 function updateSliderColor() {
   if (!seek.max || seek.max == 0) return;
 
   const value = (seek.value / seek.max) * 100;
 
-  // Warna progress smooth
+  // Kita pakai variable 'activeColor' disini
   seek.style.background = `
     linear-gradient(90deg, 
-      #4facfe ${value}%, 
+      ${activeColor} ${value}%, 
       #d0d0d0 ${value}%)
   `;
 }
@@ -426,18 +466,25 @@ window.addEventListener("load", () => {
 });
 
 // ========================
-// LIRIK SYNC FUNCTION
+// LIRIK SYNC ENGINE (ch.js)
 // ========================
-let lrcData = []; // simpan lirik sinkron
-let lastActiveIndex = -1; // track baris aktif terakhir
+
+let lrcData = []; // Simpan data {time, lyric}
+let lastActiveIndex = -1; // Track baris terakhir yang aktif
 const lyricsEl = document.getElementById("lyrics");
 
-// Fungsi utama: load lirik dari file .lrc
+// 1. Fungsi Utama: Load lirik berdasarkan file lagu
 function handleLyrics(trackSrc) {
-  const lrcFile = trackSrc.replace(".mp3", ".lrc");
+  // Ubah ekstensi .mp3 menjadi .lrc
+  const lrcFile = trackSrc.replace(/\.(mp3|wav|ogg)$/i, ".lrc");
+
+  // Reset tampilan sebelum loading
+  lyricsEl.innerHTML = '<p class="loading">Loading lyrics...</p>';
+  lrcData = [];
+
   fetch(lrcFile)
     .then((res) => {
-      if (!res.ok) throw new Error("File LRC tidak ditemukan: " + lrcFile);
+      if (!res.ok) throw new Error("404");
       return res.text();
     })
     .then((text) => {
@@ -445,74 +492,109 @@ function handleLyrics(trackSrc) {
       renderLyrics(lrcData);
     })
     .catch((err) => {
-      console.warn("Tidak ada lirik:", err);
+      console.log("Lirik tidak ditemukan:", err);
+      lyricsEl.innerHTML = '<p class="no-lyrics">Lyrics not available</p>';
       lrcData = [];
-      renderLyrics(lrcData);
     });
 }
 
-// Parse isi LRC jadi array {time, lyric}
+// 2. Parser: Ubah teks LRC jadi Array Object
 function parseLRC(lrcText) {
   const lines = lrcText.split(/\r?\n/);
   const out = [];
+
+  // Regex untuk menangkap [mm:ss.xx] atau [mm:ss]
+  const timeRegex = /\[(\d{2}):(\d{2})(?:\.(\d{1,3}))?\]/;
+
   for (const raw of lines) {
-    const match = raw.match(/\[(\d{2}):(\d{2})(?:\.(\d+))?\](.*)/);
+    const match = raw.match(timeRegex);
     if (match) {
       const min = parseInt(match[1]);
       const sec = parseInt(match[2]);
-      const ms = match[3] ? parseInt(match[3].padEnd(3, "0")) / 1000 : 0;
+      const ms = match[3] ? parseFloat("0." + match[3]) : 0;
+
       const time = min * 60 + sec + ms;
-      const lyric = match[4].trim();
-      if (lyric) out.push({ time, lyric });
+      const lyric = raw.replace(timeRegex, "").trim(); // Hapus waktu, sisa teks
+
+      if (lyric) {
+        out.push({ time, lyric });
+      }
     }
   }
   return out;
 }
 
-// Render lirik ke HTML
+// 3. Render: Tampilkan baris lirik ke HTML
 function renderLyrics(data) {
-  lyricsEl.innerHTML = "";
+  lyricsEl.innerHTML = ""; // Bersihkan container
+
+  if (data.length === 0) {
+    lyricsEl.innerHTML = '<p class="no-lyrics">Instrumental / No Text</p>';
+    return;
+  }
+
+  // Buat elemen <p> untuk setiap baris
+  const fragment = document.createDocumentFragment(); // Optimasi DOM
   data.forEach((line, i) => {
     const p = document.createElement("p");
     p.textContent = line.lyric;
-    p.id = "lyric-" + i;
-    lyricsEl.appendChild(p);
+    p.id = `lyric-${i}`;
+    fragment.appendChild(p);
   });
-  lastActiveIndex = -1; // reset highlight
+
+  lyricsEl.appendChild(fragment);
+  lastActiveIndex = -1; // Reset highlight
 }
 
-// Update lirik saat lagu berjalan
+// 4. Update: Highlight lirik sesuai durasi lagu
 function updateLyrics(currentTime) {
   if (!lrcData.length) return;
+
+  // Cari index lirik yang pas dengan waktu sekarang
   let idx = lrcData.findIndex((line, i) => {
     const nextTime = lrcData[i + 1] ? lrcData[i + 1].time : Infinity;
     return currentTime >= line.time && currentTime < nextTime;
   });
-  if (idx === -1) return;
 
-  if (idx !== lastActiveIndex) {
-    // hapus highlight lama
+  // Jika index ditemukan dan berbeda dari yang terakhir aktif
+  if (idx !== -1 && idx !== lastActiveIndex) {
+    // Hapus class active dari baris sebelumnya
     if (lastActiveIndex !== -1) {
-      const prev = document.getElementById("lyric-" + lastActiveIndex);
+      const prev = document.getElementById(`lyric-${lastActiveIndex}`);
       if (prev) prev.classList.remove("active");
     }
-    // tambahkan highlight baru
-    const active = document.getElementById("lyric-" + idx);
+
+    // Tambahkan class active ke baris sekarang
+    const active = document.getElementById(`lyric-${idx}`);
     if (active) {
       active.classList.add("active");
-      lyricsEl.scrollTo({
-        top: active.offsetTop - lyricsEl.clientHeight / 0.27,
+
+      // === SCROLL OTOMATIS (CENTER) ===
+      // Ini membuat lirik selalu di tengah container
+      active.scrollIntoView({
         behavior: "smooth",
+        block: "center",
+        inline: "nearest",
       });
     }
+
     lastActiveIndex = idx;
   }
 }
 
-// Hubungkan dengan audio player
-audio.addEventListener("timeupdate", () => {
-  updateLyrics(audio.currentTime);
-});
+// 5. Event Listener: Sambungkan ke Audio Player
+// Pastikan variabel 'audio' sudah ada di main.js
+if (typeof audio !== "undefined") {
+  audio.addEventListener("timeupdate", () => {
+    updateLyrics(audio.currentTime);
+  });
+
+  // Reset lirik saat lagu selesai/ganti manual
+  audio.addEventListener("seeked", () => {
+    // Opsional: Paksa update saat user geser durasi (seek)
+    updateLyrics(audio.currentTime);
+  });
+}
 
 function resizeCanvas() {
   const styleWidth = canvas.clientWidth;
@@ -582,6 +664,7 @@ function draw() {
   ctx.stroke();
 }
 
+// --- 1. SETUP CANVAS & RESIZE ---
 function resizeCircleCanvas() {
   const dpi = window.devicePixelRatio || 1;
   const w = circleCanvas.clientWidth;
@@ -593,75 +676,69 @@ function resizeCircleCanvas() {
   ctx2.setTransform(1, 0, 0, 1, 0, 0);
   ctx2.scale(dpi, dpi);
 }
-
 resizeCircleCanvas();
 window.addEventListener("resize", resizeCircleCanvas);
 
-// ------ GUNAKAN AUDIOCTX YANG SAMA SELALU ------
+// --- 2. SETUP AUDIO ROUTING (CHAINING) ---
+// Agar suara tidak double, kita sambung seri:
+// Source -> Analyser(Waveform) -> AnalyserCircle(Border) -> Speaker
 const analyserCircle = audioCtx.createAnalyser();
 analyserCircle.fftSize = 256;
-
 const bufferCircle = analyserCircle.frequencyBinCount;
 const dataCircle = new Uint8Array(bufferCircle);
 
-// 1x saja: source audio untuk semua analis
-source.connect(analyserCircle);
-source.connect(analyser); // yang waveform
-analyserCircle.connect(audioCtx.destination);
+// Putuskan koneksi lama jika ada (opsional, untuk keamanan)
+source.disconnect();
+analyser.disconnect();
 
-// ------ DRAW CIRCLE ------
+// Sambung ulang secara seri
+source.connect(analyser); // Masuk ke Analyser 1 (Waveform)
+analyser.connect(analyserCircle); // Teruskan ke Analyser 2 (Circle/Border)
+analyserCircle.connect(audioCtx.destination); // Terakhir ke Speaker
+
+// --- 4. LOGIC GAMBAR ---
+let animationIdCircle; // Untuk mengontrol stop/start loop
+
 function drawCircleSpectrum() {
-  requestAnimationFrame(drawCircleSpectrum);
+  animationIdCircle = requestAnimationFrame(drawCircleSpectrum);
 
   analyserCircle.getByteTimeDomainData(dataCircle);
 
   const w = circleCanvas.clientWidth;
   const h = circleCanvas.clientHeight;
-
-  const imgW = 110; // ukuran gambar kamu
+  const imgW = 110;
   const imgH = 110;
-  const cornerRadius = imgW * 0.2; // 20%
-  const styles = getComputedStyle(document.documentElement);
-  const mainColor = styles.getPropertyValue("--warna-utama").trim();
-  const glowColor = styles.getPropertyValue("--warna-utama").trim();
-
-  const expand = 55; // seberapa jauh spektrum menjauh dari gambar
+  const cornerRadius = imgW * 0.2;
+  const expand = 40;
 
   ctx2.clearRect(0, 0, w, h);
   ctx2.save();
-
   ctx2.translate(w / 2, h / 2);
 
   ctx2.beginPath();
 
   const total = dataCircle.length;
-
-  for (let i = 0; i < total; i++) {
-    const v = (dataCircle[i] - 128) / 128;
+  for (let i = 0; i <= total; i++) {
+    const index = i % total;
+    const v = (dataCircle[index] - 128) / 128;
     const wave = v * expand;
-
     const t = i / total;
-
-    // PATH keliling rounded-rectangle
     let x, y;
 
+    // Logic Rounded Rectangle tetap sama
     if (t < 0.25) {
-      // top edge
       const pct = t / 0.25;
       x = -imgW / 2 + cornerRadius + pct * (imgW - 2 * cornerRadius);
       y = -imgH / 2 - wave;
     } else if (t < 0.5) {
-      // right edge
       const pct = (t - 0.25) / 0.25;
       x = imgW / 2 + wave;
       y = -imgH / 2 + cornerRadius + pct * (imgH - 2 * cornerRadius);
     } else if (t < 0.75) {
-      // bottom edge
       const pct = (t - 0.5) / 0.25;
       x = imgW / 2 - cornerRadius - pct * (imgW - 2 * cornerRadius);
       y = imgH / 2 + wave;
     } else {
-      // left edge
       const pct = (t - 0.75) / 0.25;
       x = -imgW / 2 - wave;
       y = imgH / 2 - cornerRadius - pct * (imgH - 2 * cornerRadius);
@@ -673,23 +750,39 @@ function drawCircleSpectrum() {
 
   ctx2.closePath();
 
-  // neon
-  ctx2.strokeStyle = mainColor;
+  // 🔥 PERUBAHAN UTAMA DI SINI 🔥
+  // Gunakan variable 'activeColor' yang di-update oleh loadTrack
+  ctx2.strokeStyle = activeColor || "#00ffcc"; // Fallback ke hijau jika error
+
   ctx2.lineWidth = 3;
-  ctx2.shadowBlur = 20;
-  ctx2.shadowColor = glowColor;
+  ctx2.lineJoin = "round";
+
+  // Shadow juga ikuti activeColor
+  ctx2.shadowBlur = 15;
+  ctx2.shadowColor = activeColor || "#00ffcc";
 
   ctx2.stroke();
-
   ctx2.restore();
 }
 
+// --- 5. CONTROL PLAY (Mencegah Loop Menumpuk) ---
 audio.onplay = async () => {
   if (audioCtx.state === "suspended") {
     await audioCtx.resume();
   }
-  draw(); // menjalankan waveform
-  drawCircleSpectrum(); // menjalankan spectrum lingkaran
+
+  // Batalkan animasi sebelumnya jika ada (biar gak numpuk)
+  cancelAnimationFrame(window.animationIdWave); // Asumsi kamu punya var ini untuk waveform
+  cancelAnimationFrame(animationIdCircle);
+
+  draw(); // Jalankan waveform
+  drawCircleSpectrum(); // Jalankan border neon
+};
+
+// Tambahkan onpause untuk hemat resource (opsional tapi disarankan)
+audio.onpause = () => {
+  cancelAnimationFrame(animationIdCircle);
+  // cancelAnimationFrame(window.animationIdWave);
 };
 
 // format detik -> menit:detik
@@ -931,3 +1024,33 @@ const typingObserver = new IntersectionObserver(
 );
 
 typingObserver.observe(typingEl);
+
+/* --- SCROLL SPY KHUSUS SECTION RAKSASA --- */
+
+let sections = document.querySelectorAll("section");
+let navLinks = document.querySelectorAll(".navbar a");
+
+window.onscroll = () => {
+  sections.forEach((sec) => {
+    let top = window.scrollY; // Posisi scroll kita saat ini
+    let offset = sec.offsetTop - 150; // Toleransi 150px sebelum masuk section
+    let height = sec.offsetHeight; // Tinggi section (bisa 300vh, bebas)
+    let id = sec.getAttribute("id");
+
+    // LOGIKA:
+    // Jika scroll kita LEBIH BESAR dari Pucuk Section (minus offset)
+    // DAN scroll kita LEBIH KECIL dari (Pucuk + Tinggi Section)
+    // Artinya: Kita sedang berada "di dalam" section tersebut.
+    if (top >= offset && top < offset + height) {
+      // Matikan semua active class dulu
+      navLinks.forEach((links) => {
+        links.classList.remove("active");
+
+        // Nyalakan HANYA yang ID-nya cocok
+        if (links.getAttribute("href").includes(id)) {
+          links.classList.add("active");
+        }
+      });
+    }
+  });
+};

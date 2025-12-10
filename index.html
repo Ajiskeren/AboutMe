@@ -1,405 +1,648 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>Portfolio</title>
-    <link rel="stylesheet" href="style.css">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <title>Portfolio | M. Aziz Jaya</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
     <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
-     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-  </div>
-</div>
-</head>
-<body>
-  <!-- ===== INTRO BOOT (auto runs once on load) ===== -->
-  <div id="intro" aria-hidden="false">
-    <div class="terminal" role="dialog" aria-label="Terminal boot screen">
-      <div class="term-header" aria-hidden="true">
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="cir" aria-hidden="true"></div>
-          <div class="cir" aria-hidden="true"></div>
-          <div class="cir" aria-hidden="true"></div>
+    <script
+      type="module"
+      src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
+    ></script>
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  </head>
+  <body>
+    <div id="intro" aria-hidden="false">
+      <div class="terminal" role="dialog" aria-label="Terminal boot screen">
+        <div class="term-header" aria-hidden="true">
+          <div style="display: flex; gap: 8px; align-items: center">
+            <div class="cir" aria-hidden="true"></div>
+            <div class="cir" aria-hidden="true"></div>
+            <div class="cir" aria-hidden="true"></div>
+          </div>
+          <div class="term-title">axis@linux: boot</div>
         </div>
-        <div class="term-title">axis@linux: boot</div>
+
+        <div class="term-body scanlines">
+          <div class="lines" id="intro-lines" aria-live="polite"></div>
+          <div
+            id="intro-cursor"
+            style="
+              margin-top: 12px;
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              visibility: hidden;
+            "
+          >
+            <span class="prompt">axis@linux:~$</span>
+            <span id="intro-input-placeholder" style="opacity: 0.9"></span>
+            <span class="typing-caret" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main id="main" class="main-hidden" aria-hidden="true">
+      <button id="openBtn">
+        <i
+          class="bx toggle-btnS bxs-left-arrow-alt"
+          style="font-size: 25px"
+        ></i>
+      </button>
+
+      <div id="swipe-area"></div>
+
+      <button id="toggleBtn" class="toggle-btn">
+        <div class="disc">
+          <img id="coverImg" src="assets/cover1.jpg" alt="cover" />
+        </div>
+      </button>
+
+      <div id="overlay" class="overlay"></div>
+
+      <div class="sidebar" id="sidebar">
+        <h2>ᴺᴼᵂ ᴾᴸᴬᵞᴵᴺᴳ</h2>
+        <div class="cover">
+          <img id="cover" class="image-cover" />
+          <video
+            id="videoCover"
+            class="video-cover"
+            muted
+            loop
+            playsinline
+          ></video>
+        </div>
+        <div class="Title">
+          <div class="title">
+            <h4 id="title">Song Title</h4>
+            <p id="artist">Artist</p>
+          </div>
+          <div class="time">
+            <span id="current">0:00</span>
+            <span class="separator">/</span>
+            <span id="duration">0:00</span>
+          </div>
+        </div>
+        <div><canvas class="spectrum" id="spectrum"></canvas></div>
+        <div id="PPN" class="controls">
+          <button id="prev" class="btn-control">
+            <i class="bx bx-skip-previous"></i>
+          </button>
+
+          <button id="play" class="btn-control btn-main">
+            <i class="bx bx-play"></i>
+          </button>
+
+          <button id="next" class="btn-control">
+            <i class="bx bx-skip-next"></i>
+          </button>
+        </div>
+
+        <div class="slider-container">
+          <input
+            type="range"
+            id="seek"
+            class="seek"
+            min="0"
+            value="0"
+            step="0.1"
+          />
+        </div>
+        <div class="lyrics" id="lyrics"></div>
+        <audio id="audio"></audio>
       </div>
 
-      <div class="term-body scanlines">
-        <div class="lines" id="intro-lines" aria-live="polite"></div>
-        <div id="intro-cursor" style="margin-top:12px; display:flex; align-items:center; gap:6px; visibility:hidden;">
-          <span class="prompt">axis@linux:~$</span>
-          <span id="intro-input-placeholder" style="opacity:.9"></span>
-          <span class="typing-caret" aria-hidden="true"></span>
-        </div>
-      </div>
-    </div>
-  </div>
-<!-- MAIN WEBSITE CONTENT -->
-<main id="main" class="main-hidden" aria-hidden="true">
-  <button id="openBtn"><i class='bx toggle-btnS bxs-left-arrow-alt' style="font-size: 25px;"></i></button>
-
-<div id="swipe-area"></div>
-
-<button id="toggleBtn" class="toggle-btn">
-    <div class="disc">
-    <img id="coverImg" src="assets/cover1.jpg" alt="cover">
-    </div>
-</button>
-<div id="overlay" class="overlay"></div>
-  <div class="sidebar" id="sidebar">
-       <h2>ᴺᴼᵂ ᴾᴸᴬᵞᴵᴺᴳ</h2>
-    <div class="cover">
-    <img id="cover" class="image-cover">
-    <video id="videoCover" class="video-cover" muted loop playsinline></video>
-</div>
-    <div class="Title">
-    <div class="title">
-    <h4 id="title">Judul Lagu</h4>
-    <p id="artist">Artis</p>
-    </div>
-    <div class="time">
-    <span id="current">0:00</span>
-    /
-    <span id="duration">0:00</span>
-    </div>
-    </div>
-    <div><canvas class="spectrum" id="spectrum"></canvas></div>
-    <div id="PPN" class="controls">
-      <button id="prev"><i class='bx bx-skip-previous' style="font-size: 32px;"></i></button>
-      <button id="play">◀▶</button>
-      <button id="next"><i class='bx bx-skip-next' style="font-size: 32px;"></i></button>
-    </div>
-<div class="slider-container">
-  <input type="range" id="seek" class="seek" min="0" value="0" step="0.1">
-</div>
-    <div class="lyrics" id="lyrics"></div>
-    </div>
-    <audio id="audio"></audio>
-  </div>
-  </div>
-
-    <header data-aos="fade-down" data-aos-duration="800" class="header">
+      <header class="header">
         <a href="#" class="logo">Portfolio</a>
+
         <nav class="navbar">
-            <a href="#" style="--i:1"class="active">Home</a>
-            <a href="#aboutT" style="--i:2">About</a>
-            <a href="#services" style="--i:3">Skills</a> <!-- perbaiki 'Skill' menjadi 'Skills' -->
-            <a href="#contact" style="--i:5">Contact</a>
+          <a href="#home" class="active">
+            <i class="bx bx-home-alt-2"></i>
+            <span class="nav-text">Home</span>
+          </a>
+
+          <a href="#about">
+            <i class="bx bx-user"></i>
+            <span class="nav-text">About</span>
+          </a>
+
+          <a href="#servicesS">
+            <i class="bx bx-briefcase-alt-2"></i>
+            <span class="nav-text">Services</span>
+          </a>
+
+          <a href="#skillsS">
+            <i class="bx bx-code-alt"></i>
+            <span class="nav-text">Skills</span>
+          </a>
+
+          <a href="#contact">
+            <i class="bx bx-message-square-detail"></i>
+            <span class="nav-text">Contact</span>
+          </a>
         </nav>
-    </header>
-    <section class="home" id="home"> <!-- perbaiki 'Home' menjadi 'home' -->
-<div class="Walpaper">
-  <canvas id="circleCanvas"></canvas>
-  <img class="WallpaperCover" id="coverMain" src="assets/cover1.jpg" alt="cover">
-</div>
+      </header>
+
+      <section class="home" id="home">
+        <div class="Walpaper">
+          <canvas id="circleCanvas"></canvas>
+          <img
+            class="WallpaperCover"
+            id="coverMain"
+            src="assets/cover1.jpg"
+            alt="cover"
+          />
+        </div>
         <div class="home-content">
-            <h3 id="openPlaylist" >What’s up? I'm</h3>
-            <h1>M. Aziz Jaya </h1>
-            <h3>And I am a <span class="text"></span></h3>
-            <p>I am a student 😎</p> <!-- perbaiki teks ke bahasa Inggris -->
-            <div class="home-sci">
-                <a href="https://www.instagram.com/axis_pp_ra?igsh=YjI4OWQ5aXV0YnVy" style="--i:7"><i class='bx bxl-instagram' style="font-size: 12px;"></i></box-icon></a>
-                <a href="https://wa.me/+6289508883568" style="--i:8"><i class='bx bxl-whatsapp' style="font-size:12px;"></i></box-icon ></a>
-                <a href="https://www.tiktok.com/@axis_pp_ra" style="--i:9"><i class='bx bxl-tiktok' style="font-size:12px;"></i></box-icon></a>
-                <a href="https://github.com/Ajiskeren" style="--i:10"><i class='bx bxl-github' style="font-size:12px;"></i></box-icon></a>
-            </div>
-            <a href="#contact" class="btn-box1">Contact Me</a>
+          <h3 id="openPlaylist">What’s up? I'm</h3>
+          <h1>M. Aziz Jaya</h1>
+          <h3>And I am a <span class="text"></span></h3>
+          <p>I am a student 😎</p>
+          <div class="home-sci">
+            <a
+              href="https://www.instagram.com/axis_pp_ra?igsh=YjI4OWQ5aXV0YnVy"
+              style="--i: 7"
+              ><i class="bx bxl-instagram" style="font-size: 12px"></i
+            ></a>
+            <a href="https://wa.me/+6289508883568" style="--i: 8"
+              ><i class="bx bxl-whatsapp" style="font-size: 12px"></i
+            ></a>
+            <a href="https://www.tiktok.com/@axis_pp_ra" style="--i: 9"
+              ><i class="bx bxl-tiktok" style="font-size: 12px"></i
+            ></a>
+            <a href="https://github.com/Ajiskeren" style="--i: 10"
+              ><i class="bx bxl-github" style="font-size: 12px"></i
+            ></a>
+          </div>
+          <a href="#contact" class="btn-box1">Contact Me</a>
         </div>
         <span id="aboutT" class="home-imgHover"></span>
-    </section>
-        <div class="about-text">
-            <h2 data-aos="fade-right" data-aos-duration="1000" >About<span>Me</span></h2>
-            <h3 data-aos="fade-left" data-aos-duration="1000">M. Aziz Jaya</h4>
-        </div>
-    <section class="about" id="about">
+      </section>
+
+      <div class="about-text">
+        <h2 data-aos="fade-right" data-aos-duration="1000">
+          About <span>Me</span>
+        </h2>
+        <h3 data-aos="fade-left" data-aos-duration="1000">M. Aziz Jaya</h3>
+      </div>
+
+      <section class="about" id="about">
         <div class="about-intro">
-        
-        <div data-aos="fade-right" data-aos-duration="1000" class="about-text">
-<p id="text">
-  Hi! My name is M. Aziz Jaya (call me Ajis), a 15-year-old student from Bagelen 1, Pesawaran, Lampung. I’m passionate about coding, design, and technology, with skills in HTML, CSS, JavaScript, Python, and Node.js. I’ve created projects like music websites, portfolio sites, and WhatsApp bots, and my goal is to become a professional programmer.
-  <span id="dots"></span>
+          <div
+            data-aos="fade-right"
+            data-aos-duration="1000"
+            class="about-text"
+          >
+            <p id="text">
+              Hi! My name is M. Aziz Jaya (call me Ajis), a 15-year-old student
+              from Bagelen 1, Pesawaran, Lampung. I’m passionate about coding,
+              design, and technology, with skills in HTML, CSS, JavaScript,
+              Python, and Node.js. I’ve created projects like music websites,
+              portfolio sites, and WhatsApp bots, and my goal is to become a
+              professional programmer.
 
-  <span id="more" class="collapsed">
-    <br>
-    Outside of coding, I enjoy playing games such as GTA San Andreas Multiplayer (JGRP server) and Mobile Legends, as well as listening to music on Spotify. I started coding out of curiosity, and now it has become my favorite way to learn, think logically, and explore new ideas.
-  </span>
-</p>
+              <span id="dots">...</span>
 
-<button onclick="readMore()" id="btn" class="btn-box2 expand-btn">Baca Selengkapnya</button>
+              <span id="more" class="collapsed">
+                <br /><br />
+                Outside of coding, I enjoy playing games such as GTA San Andreas
+                Multiplayer (JGRP server) and Mobile Legends, as well as
+                listening to music on Spotify. I started coding out of
+                curiosity, and now it has become my favorite way to learn, think
+                logically, and explore new ideas.
+              </span>
+            </p>
+
+            <button onclick="readMore()" id="btn" class="btn-box2 expand-btn">
+              Read More
+            </button>
+          </div>
         </div>
-        </div>
-    </section>
-    <section>
+      </section>
+
+      <section id="servicesS">
         <div class="services" id="services">
-            <div class="container">
-                <h1 data-aos="fade-left" data-aos-duration="500" class="sub-title">My <span>services</span></h1>
-                <div class="services-list">
-                    <div data-aos="flip-left" data-aos-duration="800">
-                        <i class='bx bx-code' style='color:var(--warna-utama)'  ></i>
-                        <h2>UI/UX Design</h2>
-                        <p>Creative designs using Canva, Photoshop, and GIMP for social media, branding, and digital content.</p>
-                        <a href="#contact" class="read">Contact me</a>
-                    </div>
-                    
-    
-                    <div data-aos="flip-left" data-aos-duration="800">
-                        <i class='bx bx-crop' style='color:var(--warna-utama)'  ></i>
-                        <h2>Graphic Design</h2>
-                        <p>Modern and user-friendly interfaces that focus on smooth navigation and great user experience.</p>
-                        <a href="#contact" class="read">Contact me</a>
-                    </div>
-                    <div data-aos="flip-left" data-aos-duration="800">
-                        <i class='bx bxl-visual-studio' style='color:var(--warna-utama)'></i>
-                        <h2>Web Development</h2>
-                        <p>Responsive websites built with HTML, CSS, and JavaScript, plus basic Node.js and Python features.</p>
-                        <a href="#contact" class="read">Contact me</a>
-                    </div>
-                    <div data-aos="flip-left" data-aos-duration="800">
-                        <i class='bx bxl-whatsapp' style='color:var(--warna-utama)'></i>
-                        <h2>WhatsApp Bot Development</h2>
-                        <p>Custom WhatsApp bots for group management, automation, and practical tools.</p>
-                        <a href="#contact" class="read">Contact me</a>
-                    </div>
-                    <div data-aos="flip-left" data-aos-duration="800">
-                        <i class='bx bx-rocket' style='color:var(--warna-utama)'></i>
-                        <h2>Automation Tools</h2>
-                        <p>Simple automation scripts with Python and Node.js to save time and reduce repetitive work.</p>
-                        <a href="#contact" class="read">Contact me</a>
-                    </div>
-                    <div data-aos="flip-left" data-aos-duration="800">
-                        <i class='bx bx-cloud-upload' style='color:var(--warna-utama)'></i>
-                        <h2>Website Maintenance</h2>
-                        <p>Regular updates, performance optimization, and bug fixing to keep websites secure and reliable.</p>
-                        <a href="#contact" class="read">Contact me</a>
-                    </div>
-                    <div data-aos="flip-left" data-aos-duration="800">
-                        <i class='bx bx-video' style='color:var(--warna-utama)'></i>
-                        <h2>Content Creation Support</h2>
-                        <p>Visuals and design elements that align with brand identity and enhance digital content.</p>
-                        <a href="#contact" class="read">Contact me</a>
-                    </div>
-                </div>
-                
+          <div class="container">
+            <h1 data-aos="fade-left" data-aos-duration="500" class="sub-title">
+              My <span>Services</span>
+            </h1>
+            <div class="services-list">
+              <div data-aos="flip-left" data-aos-duration="800">
+                <i class="bx bx-code" style="color: var(--warna-utama)"></i>
+                <h2>UI/UX Design</h2>
+                <p>
+                  Creative designs using Canva, Photoshop, and GIMP for social
+                  media, branding, and digital content.
+                </p>
+                <a href="#contact" class="read">Contact me</a>
+              </div>
+
+              <div data-aos="flip-left" data-aos-duration="800">
+                <i class="bx bx-crop" style="color: var(--warna-utama)"></i>
+                <h2>Graphic Design</h2>
+                <p>
+                  Modern and user-friendly interfaces that focus on smooth
+                  navigation and great user experience.
+                </p>
+                <a href="#contact" class="read">Contact me</a>
+              </div>
+              <div data-aos="flip-left" data-aos-duration="800">
+                <i
+                  class="bx bxl-visual-studio"
+                  style="color: var(--warna-utama)"
+                ></i>
+                <h2>Web Development</h2>
+                <p>
+                  Responsive websites built with HTML, CSS, and JavaScript, plus
+                  basic Node.js and Python features.
+                </p>
+                <a href="#contact" class="read">Contact me</a>
+              </div>
+              <div data-aos="flip-left" data-aos-duration="800">
+                <i
+                  class="bx bxl-whatsapp"
+                  style="color: var(--warna-utama)"
+                ></i>
+                <h2>WhatsApp Bot Development</h2>
+                <p>
+                  Custom WhatsApp bots for group management, automation, and
+                  practical tools.
+                </p>
+                <a href="#contact" class="read">Contact me</a>
+              </div>
+              <div data-aos="flip-left" data-aos-duration="800">
+                <i class="bx bx-rocket" style="color: var(--warna-utama)"></i>
+                <h2>Automation Tools</h2>
+                <p>
+                  Simple automation scripts with Python and Node.js to save time
+                  and reduce repetitive work.
+                </p>
+                <a href="#contact" class="read">Contact me</a>
+              </div>
+              <div data-aos="flip-left" data-aos-duration="800">
+                <i
+                  class="bx bx-cloud-upload"
+                  style="color: var(--warna-utama)"
+                ></i>
+                <h2>Website Maintenance</h2>
+                <p>
+                  Regular updates, performance optimization, and bug fixing to
+                  keep websites secure and reliable.
+                </p>
+                <a href="#contact" class="read">Contact me</a>
+              </div>
+              <div data-aos="flip-left" data-aos-duration="800">
+                <i class="bx bx-video" style="color: var(--warna-utama)"></i>
+                <h2>Content Creation Support</h2>
+                <p>
+                  Visuals and design elements that align with brand identity and
+                  enhance digital content.
+                </p>
+                <a href="#contact" class="read">Contact me</a>
+              </div>
             </div>
+          </div>
         </div>
-    </section> 
-    <h1 data-aos="fade-right" data-aos-duration="500" class="sub-title">My <span >Skills</span></h1>
-    <section>
-      
+      </section>
+
+      <h1 data-aos="fade-right" data-aos-duration="500" class="sub-title">
+        My <span>Skills</span>
+      </h1>
+      <section id="skillsS">
         <div class="container1" id="skills">
-                <h1 data-aos="fade-right" data-aos-duration="1000" class="heading1">Technical Skills</h1>
-            <div class="Technical-bars">
-            
-                <div class="bar"><i style="color: #c95d2e" class='bx bxl-html5'></i>
-                    <div class="info">
-                        <span>HTML</span>
-                    </div>
-                    <div class="progress-line html">
-                        <span></span>
-                    </div>
-                </div>
-                <div class="bar"><i style="color: #147bbc" class='bx bxl-css3'></i>
-                    <div class="info">
-                        <span>CSS</span>
-                    </div>
-                    <div class="progress-line css">
-                        <span></span>
-                    </div>
-                </div>
-                <div class="bar"><i style="color: #b0bc1e" class='bx bxl-javascript'></i>
-                    <div class="info">
-                        <span>Javascript</span>
-                    </div>
-                    <div class="progress-line javascript">
-                        <span></span>
-                    </div>
-                </div>
-                <div class="bar"><i style="color: #c322c9" class='bx bxl-python'></i>
-                    <div class="info">
-                        <span>Python</span>
-                    </div>
-                    <div class="progress-line python">
-                        <span></span>
-                    </div>
-                </div>
+          <h1 data-aos="fade-right" data-aos-duration="1000" class="heading1">
+            Technical Skills
+          </h1>
+          <div class="Technical-bars">
+            <div class="bar">
+              <i style="color: #c95d2e" class="bx bxl-html5"></i>
+              <div class="info"><span>HTML</span></div>
+              <div class="progress-line html"><span></span></div>
             </div>
+            <div class="bar">
+              <i style="color: #147bbc" class="bx bxl-css3"></i>
+              <div class="info"><span>CSS</span></div>
+              <div class="progress-line css"><span></span></div>
+            </div>
+            <div class="bar">
+              <i style="color: #b0bc1e" class="bx bxl-javascript"></i>
+              <div class="info"><span>Javascript</span></div>
+              <div class="progress-line javascript"><span></span></div>
+            </div>
+            <div class="bar">
+              <i style="color: #c322c9" class="bx bxl-python"></i>
+              <div class="info"><span>Python</span></div>
+              <div class="progress-line python"><span></span></div>
+            </div>
+          </div>
         </div>
-    
-    
+
         <div class="container2">
-            <h1 data-aos="fade-right" data-aos-duration="500" class="heading2">Profesional Skills</h1>
-            <div data-aos="zoom-in" data-aos-duration="500" class="radial-bars">
-
-                <div class="radial-bar">
-                    <svg x="0px" y="0px" viewBox="0 0 200 200">
-                        <circle class="progress-bar" cx="100" cy="100" r="80"></circle>
-                        <circle class="path path-1" cx="100" cy="100" r="80"></circle>
-                    </svg>
-                        <div class="percentage">75%</div>
-                        <div class="text">creativity</div>
-                </div>
-                <div class="radial-bar">
-    
-                    <svg x="0px" y="0px" viewBox="0 0 200 200">
-                        <circle class="progress-bar" cx="100" cy="100" r="80"></circle>
-                        <circle class="path path-2" cx="100" cy="100" r="80"></circle>
-        
-                    </svg>
-                    <div class="percentage">80%</div>
-                    <div class="text">comunication</div>
-                </div>            
-                <div class="radial-bar">
-                    <svg x="0px" y="0px" viewBox="0 0 200 200">
-                        <circle class="progress-bar" cx="100" cy="100" r="80"></circle>
-                        <circle class="path path-3" cx="100" cy="100" r="80"></circle>
-                    </svg>
-                    <div class="percentage">80%</div>
-                    <div class="text">problem solve</div>
-                </div>
-                <div class="radial-bar">
-                    <svg x="0px" y="0px" viewBox="0 0 200 200">
-                        <circle class="progress-bar" cx="100" cy="100" r="80"></circle>
-                        <circle class="path path-4" cx="100" cy="100" r="80"></circle>
-                    </svg>
-                    <div class="percentage">70%</div>
-                    <div class="text">TeamWork</div>
-                </div>
+          <h1 data-aos="fade-right" data-aos-duration="500" class="heading2">
+            Professional Skills
+          </h1>
+          <div data-aos="zoom-in" data-aos-duration="500" class="radial-bars">
+            <div class="radial-bar">
+              <svg x="0px" y="0px" viewBox="0 0 200 200">
+                <circle class="progress-bar" cx="100" cy="100" r="80"></circle>
+                <circle class="path path-1" cx="100" cy="100" r="80"></circle>
+              </svg>
+              <div class="percentage">75%</div>
+              <div class="text">Creativity</div>
             </div>
+            <div class="radial-bar">
+              <svg x="0px" y="0px" viewBox="0 0 200 200">
+                <circle class="progress-bar" cx="100" cy="100" r="80"></circle>
+                <circle class="path path-2" cx="100" cy="100" r="80"></circle>
+              </svg>
+              <div class="percentage">80%</div>
+              <div class="text">Communication</div>
+            </div>
+            <div class="radial-bar">
+              <svg x="0px" y="0px" viewBox="0 0 200 200">
+                <circle class="progress-bar" cx="100" cy="100" r="80"></circle>
+                <circle class="path path-3" cx="100" cy="100" r="80"></circle>
+              </svg>
+              <div class="percentage">80%</div>
+              <div class="text">Problem Solving</div>
+            </div>
+            <div class="radial-bar">
+              <svg x="0px" y="0px" viewBox="0 0 200 200">
+                <circle class="progress-bar" cx="100" cy="100" r="80"></circle>
+                <circle class="path path-4" cx="100" cy="100" r="80"></circle>
+              </svg>
+              <div class="percentage">70%</div>
+              <div class="text">Teamwork</div>
+            </div>
+          </div>
         </div>
-    </section>
+      </section>
 
-
-
-    <section class="contact" id="contact">
+      <section class="contact" id="contact">
         <div class="contact-text">
-            <h2 data-aos="fade-right" data-aos-duration="300" >Contact <span>Me</span></h2>
-            <h4 data-aos="fade-right" data-aos-duration="600" >Wanna Make Something Cool?</h4>
-            <p id="typing" ></p>
-            <ul class="contact-list">
-                <li data-aos="zoom-in" data-aos-duration="500" ><i data-aos="fade-right" data-aos-duration="500" class="bx bxs-send"></i> ezdek1231@gmail.com</li>
-                <li data-aos="zoom-in" data-aos-duration="500" ><i data-aos="fade-right" data-aos-duration="500" class="bx bxs-phone"></i> 089508883568</li>
-            </ul>
+          <h2 data-aos="fade-right" data-aos-duration="300">
+            Contact <span>Me</span>
+          </h2>
+          <h4 data-aos="fade-right" data-aos-duration="600">
+            Wanna Make Something Cool?
+          </h4>
+          <p id="typing"></p>
+          <ul class="contact-list">
+            <li data-aos="zoom-in" data-aos-duration="500">
+              <i
+                data-aos="fade-right"
+                data-aos-duration="500"
+                class="bx bxs-send"
+              ></i>
+              ezdek1231@gmail.com
+            </li>
+            <li data-aos="zoom-in" data-aos-duration="500">
+              <i
+                data-aos="fade-right"
+                data-aos-duration="500"
+                class="bx bxs-phone"
+              ></i>
+              089508883568
+            </li>
+          </ul>
         </div>
-    
-    </section>
+      </section>
 
-<div class="contact-form">
-  <form id="contactForm">
-    <input data-aos="fade-right" data-aos-duration="300" type="text" name="from_name" placeholder="Enter Your Name" required>
-    <textarea data-aos="fade-right" data-aos-duration="600" name="message" placeholder="Enter Your Message" required></textarea>
-    <button data-aos="fade-right" data-aos-duration="800" class="send" type="submit">Submit</button>
-  </form>
-</div>
-
-        <div class="contact-icons">
-            <a data-aos="flip-left" data-aos-duration="500" href="https://www.instagram.com/axis_pp_ra"><i class="bx bxl-instagram"></i></a>
-            <a data-aos="flip-left" data-aos-duration="1000" href="https://wa.me/+6289508883568"><i class="bx bxl-whatsapp"></i></a>
-            <a data-aos="flip-left" data-aos-duration="1500" href="https://www.tiktok.com/@axis_pp_ra"><i class="bx bxl-tiktok"></i></a>
-            <a data-aos="flip-left" data-aos-duration="2000" href="https://github.com/Ajiskeren"><i class="bx bxl-github"></i></a>
-        </div>
-    <div class="last-text">
-        <p>developed with M. Aziz Jaya</p>
-    </div>
-    <a href="#" id="scrollUpBtn" class="top"><i class='bx bx-up-arrow-alt'></i></a>
-
-
-
-  <!-- Sidebar -->
-  <div id="sidebarS" class="sidebar-container">
-    <div class="sidebar-widgetJ">
-        <div id="tanggal" class="tanggal-box"></div>
-  <div id="time" class="widget-time">
-    <span id="hours">00</span>
-    <span id="minutes">00</span>
-    <span id="seconds">00</span>
-  </div>
-<button id="gantiWarna">Colors</button>
-
-<div id="colorPickerBox">
-  <input type="color" id="colorPicker">
-</div>
-  <button id="closeBtn"><i class='bx bxs-right-arrow-alt toggle-btnST'></i></button>
-<div class="sidebar-widget weather-widget">
-  <div id="weather" class="weather-horizontal">Memuat...</div>
-</div>
-</div>
-  </div>
-</div>
-
-  <div id="playlistModal" class="playlist-modal">
-  <div class="playlist-content">
-            <span id="closePlaylist" class="close-btn">&times;</span>
-        <h2>Playlist</h2>
-    <ul id="popupPlaylist" class="popup-playlist"></ul>
-</div>
-
-
-</div>
-</main>
-
-  <!-- ===== TERMINAL OVERLAY (INTERACTIVE) - hidden until icon clicked ===== -->
-  <div id="terminalOverlay" class="overlay-hidden" aria-hidden="true">
-    <div class="terminal" role="dialog" aria-label="Interactive Terminal">
-      <div class="term-header" aria-hidden="true">
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="cir" aria-hidden="true"></div>
-          <div class="cir" aria-hidden="true"></div>
-          <div class="cir" aria-hidden="true"></div>
-        </div>
-        <div class="term-title">axis@linux</div>
-        <button class="term-close" id="termClose" aria-label="Close terminal">✕</button>
+      <div class="contact-form">
+        <form id="contactForm">
+          <input
+            data-aos="fade-right"
+            data-aos-duration="300"
+            type="text"
+            name="from_name"
+            placeholder="Enter Your Name"
+            required
+          />
+          <textarea
+            data-aos="fade-right"
+            data-aos-duration="600"
+            name="message"
+            placeholder="Enter Your Message"
+            required
+          ></textarea>
+          <button
+            data-aos="fade-right"
+            data-aos-duration="800"
+            class="send"
+            type="submit"
+          >
+            Submit
+          </button>
+        </form>
       </div>
 
-      <div class="term-body scanlines" id="termBodyOverlay">
-        <div class="lines" id="linesOverlay" aria-live="polite"></div>
+      <div class="contact-icons">
+        <a
+          data-aos="flip-left"
+          data-aos-duration="500"
+          href="https://www.instagram.com/axis_pp_ra"
+          ><i class="bx bxl-instagram"></i
+        ></a>
+        <a
+          data-aos="flip-left"
+          data-aos-duration="1000"
+          href="https://wa.me/+6289508883568"
+          ><i class="bx bxl-whatsapp"></i
+        ></a>
+        <a
+          data-aos="flip-left"
+          data-aos-duration="1500"
+          href="https://www.tiktok.com/@axis_pp_ra"
+          ><i class="bx bxl-tiktok"></i
+        ></a>
+        <a
+          data-aos="flip-left"
+          data-aos-duration="2000"
+          href="https://github.com/Ajiskeren"
+          ><i class="bx bxl-github"></i
+        ></a>
+      </div>
 
-        <div id="promptRowOverlay" class="prompt-row" style="display:flex;align-items:center;gap:10px;margin-top:12px;">
-          <span class="prompt-text" id="promptTextOverlay">axis@linux:~$</span>
-          <input id="termInputOverlay" class="term-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
+      <div class="last-text">
+        <p>Developed by M. Aziz Jaya</p>
+      </div>
+
+      <a href="#" id="scrollUpBtn" class="top"
+        ><i class="bx bx-up-arrow-alt"></i
+      ></a>
+
+      <div id="sidebarS" class="sidebar-container">
+        <div class="sidebar-widgetJ">
+          <div id="tanggal" class="tanggal-box"></div>
+          <div id="time" class="widget-time">
+            <span id="hours">00</span>
+            <span id="minutes">00</span>
+            <span id="seconds">00</span>
+          </div>
+          <button id="gantiWarna">Colors</button>
+          <div id="colorPickerBox">
+            <input type="color" id="colorPicker" />
+          </div>
+          <button id="closeBtn">
+            <i class="bx bxs-right-arrow-alt toggle-btnST"></i>
+          </button>
+          <div class="sidebar-widget weather-widget">
+            <div id="weather" class="weather-horizontal">Memuat...</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="playlistModal" class="playlist-modal">
+        <div class="playlist-content">
+          <span id="closePlaylist" class="close-btn">&times;</span>
+          <h2>Playlist</h2>
+          <ul id="popupPlaylist" class="popup-playlist"></ul>
+        </div>
+      </div>
+    </main>
+
+    <div id="terminalOverlay" class="overlay-hidden" aria-hidden="true">
+      <div class="terminal" role="dialog" aria-label="Interactive Terminal">
+        <div class="term-header" aria-hidden="true">
+          <div style="display: flex; gap: 8px; align-items: center">
+            <div class="cir" aria-hidden="true"></div>
+            <div class="cir" aria-hidden="true"></div>
+            <div class="cir" aria-hidden="true"></div>
+          </div>
+          <div class="term-title">axis@linux</div>
+          <button class="term-close" id="termClose" aria-label="Close terminal">
+            ✕
+          </button>
+        </div>
+
+        <div class="term-body scanlines" id="termBodyOverlay">
+          <div class="lines" id="linesOverlay" aria-live="polite"></div>
+          <div
+            id="promptRowOverlay"
+            class="prompt-row"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              margin-top: 12px;
+            "
+          >
+            <span class="prompt-text" id="promptTextOverlay"
+              >axis@linux:~$</span
+            >
+            <input
+              id="termInputOverlay"
+              class="term-input"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              inputmode="none"
+            />
+          </div>
+        </div>
+
+        <div id="retroKeyboard" class="retro-keyboard">
+          <div class="kb-row">
+            <button class="key" data-key="q">Q</button>
+            <button class="key" data-key="w">W</button>
+            <button class="key" data-key="e">E</button>
+            <button class="key" data-key="r">R</button>
+            <button class="key" data-key="t">T</button>
+            <button class="key" data-key="y">Y</button>
+            <button class="key" data-key="u">U</button>
+            <button class="key" data-key="i">I</button>
+            <button class="key" data-key="o">O</button>
+            <button class="key" data-key="p">P</button>
+          </div>
+          <div class="kb-row">
+            <button class="key" data-key="a">A</button>
+            <button class="key" data-key="s">S</button>
+            <button class="key" data-key="d">D</button>
+            <button class="key" data-key="f">F</button>
+            <button class="key" data-key="g">G</button>
+            <button class="key" data-key="h">H</button>
+            <button class="key" data-key="j">J</button>
+            <button class="key" data-key="k">K</button>
+            <button class="key" data-key="l">L</button>
+          </div>
+          <div class="kb-row">
+            <button class="key special" data-key="clear">CLR</button>
+            <button class="key" data-key="z">Z</button>
+            <button class="key" data-key="x">X</button>
+            <button class="key" data-key="c">C</button>
+            <button class="key" data-key="v">V</button>
+            <button class="key" data-key="b">B</button>
+            <button class="key" data-key="n">N</button>
+            <button class="key" data-key="m">M</button>
+            <button class="key special" data-key="backspace">⌫</button>
+          </div>
+          <div class="kb-row">
+            <button class="key space" data-key=" ">SPACE</button>
+            <button class="key enter glitch-text" data-key="enter">
+              ENTER
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Floating terminal icon (icon-only) -->
-  <button id="terminalToggle" class="terminal-btn" aria-label="Open terminal" title="Terminal (⌨)">&gt;_</button>
+    <button
+      id="terminalToggle"
+      class="terminal-btn"
+      aria-label="Open terminal"
+      title="Terminal (⌨)"
+    >
+      &gt;_
+    </button>
 
-  <!-- Audio (sesuaikan path bila perlu) -->
-  <audio id="glitchSound" src="noise.wav" preload="auto"></audio>
-  <audio id="typeSound" src="assets/audio/type-click.mp3" preload="auto"></audio>
-  <audio id="errBeep" src="assets/audio/error-beep.mp3" preload="auto"></audio>
-    
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
-<script src="track.js"></script>
-<script src="main.js"></script>
-<script src="ch.js"></script>
-<script src="terminal.js"></script>
-<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-<script>
-  AOS.init();
-</script>
-  <input type="color" id="gradientColor1" style="display:none;">
-<input type="color" id="gradientColor2" style="display:none;">
+    <audio id="glitchSound" src="noise.wav" preload="auto"></audio>
+    <audio
+      id="typeSound"
+      src="assets/audio/type-click.mp3"
+      preload="auto"
+    ></audio>
+    <audio
+      id="errBeep"
+      src="assets/audio/error-beep.mp3"
+      preload="auto"
+    ></audio>
 
-<div id="gradientPopup" class="gradient-popup">
-  <div class="gradient-box">
-    <h3>Edit Gradient</h3>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
+    <script src="track.js"></script>
+    <script src="main.js"></script>
+    <script src="ch.js"></script>
+    <script src="terminal.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+      AOS.init();
+    </script>
 
-    <label>Warna 1</label>
-    <input type="color" id="g1">
+    <input type="color" id="gradientColor1" style="display: none" />
+    <input type="color" id="gradientColor2" style="display: none" />
 
-    <label>Warna 2</label>
-    <input type="color" id="g2">
-
-    <label>Arah (0-360°)</label>
-    <input type="range" id="gAngle" min="0" max="360" value="90">
-
-    <div id="gradientPreview" class="gradient-preview"></div>
-
-    <button id="applyGradient">Apply</button>
-    <button id="closeGradient">Cancel</button>
-    </body>
-    </html>
-
+    <div id="gradientPopup" class="gradient-popup">
+      <div class="gradient-box">
+        <h3>Edit Gradient</h3>
+        <label>Warna 1</label>
+        <input type="color" id="g1" />
+        <label>Warna 2</label>
+        <input type="color" id="g2" />
+        <label>Arah (0-360°)</label>
+        <input type="range" id="gAngle" min="0" max="360" value="90" />
+        <div id="gradientPreview" class="gradient-preview"></div>
+        <button id="applyGradient">Apply</button>
+        <button id="closeGradient">Cancel</button>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,399 @@
+/* --- VARIABEL & BASE STYLE --- */
+:root {
+  --retro-bg: #0a0a0a;
+  --retro-term-bg: #001100;
+  --retro-green: #0f0;
+  --retro-green-dark: #005500;
+  --retro-cyan: #0ff;
+  --retro-magenta: #f0f;
+  --retro-glitch-color-1: red;
+  --retro-glitch-color-2: blue;
+  --term-font: "Share Tech Mono", monospace; /* Atau 'VT323' untuk lebih pixelated */
+}
+
+/* --- TOMBOL TOGGLE RETRO --- */
+.retro-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--retro-bg);
+  color: var(--retro-green);
+  border: 2px solid var(--retro-green);
+  padding: 15px 25px;
+  font-family: var(--term-font);
+  font-size: 1.1rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  overflow: hidden;
+  z-index: 1000;
+  box-shadow: 4px 4px 0px var(--retro-green-dark);
+  transition: all 0.1s;
+}
+
+.retro-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px var(--retro-green-dark);
+}
+
+.retro-btn:hover .btn-text {
+  text-shadow: 2px 0 var(--retro-glitch-color-1),
+    -2px 0 var(--retro-glitch-color-2);
+}
+
+/* Efek kedip pada kursor di tombol */
+.btn-text::after {
+  content: "_";
+  animation: blink 1s step-end infinite;
+}
+
+/* --- CONTAINER CHAT UTAMA --- */
+.retro-container {
+  position: fixed;
+  bottom: 90px;
+  right: 30px;
+  width: 350px;
+  height: 500px;
+  background-color: var(--retro-term-bg);
+  border: 2px solid var(--retro-green);
+  font-family: var(--term-font);
+  color: var(--retro-green);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 999;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+}
+
+/* --- STATE & ANIMASI MUNCUL/HILANG --- */
+
+/* Keadaan tersembunyi */
+.retro-container.hidden {
+  display: none;
+  opacity: 0;
+  transform: scaleY(0.1); /* Mulai dari gepeng */
+}
+
+/* Animasi Muncul (Glitch In) */
+.retro-container.glitch-in {
+  display: flex;
+  animation: glitch-appear 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Animasi Hilang (Glitch Out) */
+.retro-container.glitch-out {
+  animation: glitch-disappear 0.6s cubic-bezier(0.55, 0.085, 0.68, 0.53)
+    forwards;
+}
+
+/* Keyframes untuk Muncul */
+@keyframes glitch-appear {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.05) skewX(20deg);
+    clip-path: inset(50% 0 50% 0);
+    filter: hue-rotate(90deg) saturate(5);
+  }
+  20% {
+    opacity: 1;
+    transform: scaleY(0.2) skewX(-20deg);
+    clip-path: inset(40% 0 40% 0);
+  }
+  40% {
+    transform: scaleY(0.6) skewX(10deg);
+    clip-path: inset(20% 0 20% 0);
+    filter: hue-rotate(-90deg);
+  }
+  60% {
+    transform: scaleY(1.1) skewX(-5deg);
+    clip-path: inset(0 0 0 0);
+  }
+  80% {
+    transform: scaleY(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1) skewX(0deg);
+    filter: none;
+  }
+}
+
+/* Keyframes untuk Hilang */
+@keyframes glitch-disappear {
+  0% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  20% {
+    transform: scaleY(1.2) skewX(30deg);
+    filter: invert(1);
+  }
+  50% {
+    transform: scaleY(0.4) skewX(-30deg);
+    clip-path: inset(30% 0 30% 0);
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(0.01) skewX(50deg);
+    clip-path: inset(50% 0 50% 0);
+  }
+}
+
+/* --- EFEK VISUAL DALAM (Scanlines & Noise) --- */
+.scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 255, 0, 0.05) 3px,
+    rgba(0, 255, 0, 0.05) 4px
+  );
+  pointer-events: none;
+  z-index: 5;
+  animation: scanline-move 10s linear infinite;
+}
+
+/* Efek Chromatic Aberration statis pada container utama */
+.retro-container::before,
+.retro-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  z-index: -1;
+}
+/* Lapisan Merah Bergeser */
+.retro-container::before {
+  box-shadow: 3px 0 0 rgba(255, 0, 0, 0.5), inset 3px 0 0 rgba(255, 0, 0, 0.5);
+  animation: chromatic-shift 2s infinite reverse;
+}
+/* Lapisan Biru Bergeser */
+.retro-container::after {
+  box-shadow: -3px 0 0 rgba(0, 0, 255, 0.5), inset -3px 0 0 rgba(0, 0, 255, 0.5);
+  animation: chromatic-shift 3s infinite;
+}
+
+/* --- KOMPONEN INTERNAL --- */
+.chat-header {
+  padding: 10px;
+  background: var(--retro-green-dark);
+  color: var(--retro-bg);
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--retro-green);
+}
+
+.close-btn {
+  cursor: pointer;
+}
+.close-btn:hover {
+  color: var(--retro-magenta);
+}
+
+.retro-history {
+  flex-grow: 1;
+  padding: 15px;
+  overflow-y: auto;
+  /* Scrollbar retro custom */
+  scrollbar-width: thin;
+  scrollbar-color: var(--retro-green) var(--retro-term-bg);
+}
+
+/* Style pesan */
+.sys-msg {
+  color: #555;
+  font-style: italic;
+  margin: 5px 0;
+  font-size: 0.9rem;
+}
+.user-msg {
+  margin: 10px 0;
+  color: var(--retro-cyan);
+  text-align: right;
+}
+.bot-msg {
+  margin: 10px 0;
+  color: var(--retro-green);
+  text-shadow: 1px 0 #f0f, -1px 0 #0ff;
+}
+
+.retro-input-area {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-top: 2px solid var(--retro-green);
+  background: var(--retro-bg);
+}
+
+.prompt {
+  margin-right: 5px;
+  color: var(--retro-green);
+}
+
+.retro-input {
+  flex-grow: 1;
+  background: transparent;
+  border: none;
+  color: var(--retro-green);
+  font-family: var(--term-font);
+  font-size: 1.1rem;
+  outline: none;
+}
+
+.retro-send-btn {
+  background: var(--retro-green);
+  color: var(--retro-bg);
+  border: none;
+  padding: 5px 10px;
+  font-family: var(--term-font);
+  cursor: pointer;
+  font-weight: bold;
+  margin-left: 5px;
+}
+.retro-send-btn:hover {
+  background: var(--retro-magenta);
+  color: white;
+}
+
+/* --- ANIMASI UTILITAS --- */
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes scanline-move {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 100%;
+  }
+}
+@keyframes chromatic-shift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.5;
+  }
+  10% {
+    transform: translate(2px, 1px);
+    opacity: 0.8;
+  }
+  20% {
+    transform: translate(-1px, 2px);
+    opacity: 0.3;
+  }
+  30% {
+    transform: translate(3px, -2px);
+  }
+  /* Sisanya diam untuk efek glitch yang sporadis */
+  40%,
+  90% {
+    transform: translate(0, 0);
+  }
+}
+
+/* Efek loading saat AI berpikir */
+#loading-text {
+  animation: flicker-text 0.2s infinite;
+}
+@keyframes flicker-text {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* --- RESPONSIVE MOBILE (HP) --- */
+@media screen and (max-width: 768px) {
+  /* 1. Atur Ukuran & Posisi Container Chat */
+  .retro-container {
+    width: 90vw; /* Pakai 90% lebar layar */
+    height: 65vh; /* Pakai 65% tinggi layar */
+
+    /* Posisi Tengah di HP */
+    right: 5vw; /* Beri jarak 5% dari kanan */
+    left: 5vw; /* Beri jarak 5% dari kiri */
+    bottom: 85px; /* Jarak dari bawah (di atas tombol toggle) */
+
+    font-size: 0.95rem; /* Sedikit kecilkan font agar muat banyak */
+  }
+
+  /* 2. Sesuaikan Tombol Toggle */
+  .retro-btn {
+    bottom: 15px;
+    right: 5vw; /* Sejajar dengan container chat */
+    padding: 12px 20px;
+    font-size: 1rem;
+    width: auto;
+    max-width: 90vw; /* Agar tombol tidak melebar keluar layar */
+
+    /* Efek sentuh lebih responsif */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 3. Perbaikan Input di iPhone (Mencegah Zoom Otomatis) */
+  .retro-input {
+    font-size: 16px; /* Wajib 16px di iOS agar tidak auto-zoom saat ngetik */
+  }
+
+  /* 4. Area Input Tombol Kirim */
+  .retro-input-area {
+    padding: 8px;
+  }
+
+  .retro-send-btn {
+    padding: 8px 15px; /* Perbesar area sentuh tombol kirim */
+  }
+
+  /* 5. Sesuaikan Animasi Glitch untuk Layar Kecil */
+  /* Kita kurangi efek miring (skew) yang terlalu ekstrim agar tidak keluar layar HP */
+  @keyframes glitch-appear {
+    0% {
+      opacity: 0;
+      transform: scaleY(0.05); /* Hapus skewX untuk mobile agar lebih rapi */
+      clip-path: inset(50% 0 50% 0);
+    }
+    50% {
+      transform: scaleY(1.1);
+      clip-path: inset(0 0 0 0);
+    }
+    100% {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+  }
+}
+
+/* --- TWEAK KHUSUS LANDSCAPE (HP Miring) --- */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .retro-container {
+    height: 80vh;
+    bottom: 10px;
+    width: 60vw;
+    right: 10px;
+    left: auto; /* Reset left */
+  }
+
+  .retro-btn {
+    bottom: 10px;
+    right: 10px;
+    transform: scale(0.8); /* Perkecil tombol */
+    transform-origin: bottom right;
+  }
+}
