@@ -272,30 +272,65 @@
     },
 
     // Music Player
-    play(args) {
+    // Music Player (Updated by Sarah)
+    async play(args) {
+      // 1. Cek Data Lagu
       if (typeof tracks === "undefined") {
-        appendLineTo(linesOverlay, "[ERR] Audio driver not loaded.");
+        appendLineTo(
+          linesOverlay,
+          "[ERR] Database lagu (tracks) tidak ditemukan."
+        );
         return;
       }
+
       let query = args.join(" ").toLowerCase();
 
+      // 2. Logic Resume (Resume/Unpause lagu yang sedang ada)
       if (!query) {
-        if (typeof audio !== "undefined") audio.play();
-        appendLineTo(linesOverlay, "Resuming audio stream...");
+        if (typeof audio !== "undefined") {
+          // FIX: Bangunkan Visualizer yang tidur
+          if (
+            typeof audioCtx !== "undefined" &&
+            audioCtx.state === "suspended"
+          ) {
+            await audioCtx.resume();
+          }
+          audio.play();
+          appendLineTo(linesOverlay, "▶ Resuming audio stream...");
+        }
         return;
       }
 
+      // 3. Logic Search (Cari Lagu Baru)
       let foundIndex = tracks.findIndex((t) =>
         t.title.toLowerCase().includes(query)
       );
+
       if (foundIndex !== -1 && typeof loadTrack === "function") {
+        // Panggil fungsi player utama
         loadTrack(foundIndex);
-        audio.play();
-        appendLineTo(linesOverlay, `Now Playing: ${tracks[foundIndex].title}`);
+
+        // FIX: Pastikan Visualizer bangun sebelum play
+        if (typeof audioCtx !== "undefined" && audioCtx.state === "suspended") {
+          await audioCtx.resume();
+        }
+
+        audio.play().catch((e) => {
+          appendLineTo(linesOverlay, `[ERR] Autoplay blocked: ${e.message}`);
+        });
+
+        appendLineTo(
+          linesOverlay,
+          `Now Playing: <span style="color:var(--accent)">${tracks[foundIndex].title}</span>`
+        );
       } else {
-        appendLineTo(linesOverlay, `[ERR] Song "${query}" not found.`);
+        appendLineTo(
+          linesOverlay,
+          `[404] Lagu "${query}" tidak ditemukan di database.`
+        );
       }
     },
+
     stop() {
       if (typeof audio !== "undefined") audio.pause();
       appendLineTo(linesOverlay, "Audio paused.");

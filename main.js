@@ -337,6 +337,10 @@ function updateSliderGradient() {
 
 // ======= loadTrack (Final Version)
 function loadTrack(index) {
+  // Pastikan index berputar (looping)
+  if (index < 0) index = tracks.length - 1;
+  if (index >= tracks.length) index = 0;
+
   currentTrack = index;
   const track = tracks[currentTrack];
   if (!track) return;
@@ -344,53 +348,125 @@ function loadTrack(index) {
   isFading = false; // reset
 
   // === 🔥 UPDATE EMOJI & WARNA SLIDER ===
-  // 1. Set Emoji
-  setSliderEmoji(track.emoji);
+  // Menggunakan try-catch agar jika fungsi ini error, lagu tetap jalan
+  try {
+    if (typeof setSliderEmoji === "function") setSliderEmoji(track.emoji);
 
-  // 2. Set Warna (Ambil dari tracks, kalau gak ada pake default)
-  activeColor = track.color || "#00ffcc";
+    activeColor = track.color || "#00ffcc";
+    document.documentElement.style.setProperty("--warna-utama", activeColor);
 
-  // 3. Update CSS Variable (Untuk Border Visualizer & Shadow)
-  document.documentElement.style.setProperty("--warna-utama", activeColor);
-
-  // 4. Update Slider Gradient Sekarang Juga
-  updateSliderGradient();
+    if (typeof updateSliderGradient === "function") updateSliderGradient();
+  } catch (e) {
+    console.log("Visual error:", e);
+  }
 
   // === SET AUDIO & TEXT ===
   audio.src = track.src;
-  title.textContent = track.title || "";
-  artist.textContent = track.artist || "";
 
-  // === SET IMAGE ===
-  const coverUrl = track.cover || "";
-  cover.src = coverUrl;
-  coverImg.src = coverUrl;
-  coverMain.src = coverUrl;
+  // Pastikan elemen ada sebelum diisi text
+  if (typeof title !== "undefined") title.textContent = track.title || "";
+  if (typeof artist !== "undefined") artist.textContent = track.artist || "";
+
+  // === SET IMAGE (WEBSITE) ===
+  const coverUrl = track.cover || ""; // Ambil dari track.cover
+
+  // Cek masing-masing elemen gambar, update jika ada
+  if (typeof cover !== "undefined" && cover) cover.src = coverUrl;
+  if (typeof coverImg !== "undefined" && coverImg) coverImg.src = coverUrl;
+  if (typeof coverMain !== "undefined" && coverMain) coverMain.src = coverUrl;
 
   // === SET VIDEO COVER ===
   if (track.videoCover) {
-    if (videoCover.getAttribute("src") !== track.videoCover) {
+    if (
+      typeof videoCover !== "undefined" &&
+      videoCover.getAttribute("src") !== track.videoCover
+    ) {
       videoCover.setAttribute("src", track.videoCover);
       try {
         videoCover.load();
       } catch (e) {}
     }
     showVideo = true;
-    showVideoCover();
+    if (typeof showVideoCover === "function") showVideoCover();
   } else {
     showVideo = false;
-    showImageCover();
+    if (typeof showImageCover === "function") showImageCover();
   }
 
   // === EXTRAS ===
-  handleLyrics(track.src);
-  highlightPopupPlaylist();
+  if (typeof handleLyrics === "function") handleLyrics(track.src);
+  if (typeof highlightPopupPlaylist === "function") highlightPopupPlaylist();
+
+  // === 🔥 BAGIAN PENTING: NOTIFIKASI HP 🔥 ===
+  // Ini memanggil fungsi baru di bawah
+  updateMediaSession(track);
 
   // Play
-  audio.play().catch((e) => console.warn("audio play:", e));
-  playBtn.textContent = "ツ"; // Icon custom kamu
+  audio.play().catch((e) => console.warn("audio play blocked:", e));
 
-  fadeIn(audio);
+  // Simbol Custom Kamu (Tidak saya ubah)
+  if (typeof playBtn !== "undefined") playBtn.textContent = "ツ";
+
+  if (typeof fadeIn === "function") fadeIn(audio);
+}
+
+function updateMediaSession(track) {
+  if ("mediaSession" in navigator) {
+    // 1. METADATA LENGKAP
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.title,
+      artist: track.artist,
+      album: "Music Player", // Bisa ganti nama websitemu
+      artwork: [
+        // Sediakan berbagai ukuran agar HP memilih yang paling tajam
+        { src: track.cover, sizes: "96x96", type: "image/jpeg" },
+        { src: track.cover, sizes: "128x128", type: "image/jpeg" },
+        { src: track.cover, sizes: "192x192", type: "image/jpeg" },
+        { src: track.cover, sizes: "256x256", type: "image/jpeg" },
+        { src: track.cover, sizes: "384x384", type: "image/jpeg" },
+        { src: track.cover, sizes: "512x512", type: "image/jpeg" },
+      ],
+    });
+
+    // 2. ACTION HANDLERS (TOMBOL & SLIDER)
+
+    // Play
+    navigator.mediaSession.setActionHandler("play", () => {
+      audio.play();
+      if (typeof playBtn !== "undefined") playBtn.textContent = "ツ";
+      updatePositionState();
+    });
+
+    // Pause
+    navigator.mediaSession.setActionHandler("pause", () => {
+      audio.pause();
+      if (typeof playBtn !== "undefined") playBtn.textContent = "II";
+      updatePositionState();
+    });
+
+    // Previous
+    navigator.mediaSession.setActionHandler("previoustrack", () => {
+      let prevIndex = currentTrack - 1;
+      if (prevIndex < 0) prevIndex = tracks.length - 1;
+      loadTrack(prevIndex);
+    });
+
+    // Next
+    navigator.mediaSession.setActionHandler("nexttrack", () => {
+      let nextIndex = (currentTrack + 1) % tracks.length;
+      loadTrack(nextIndex);
+    });
+
+    // === 🔥 FITUR PRO: USER BISA GESER DURASI DARI NOTIFIKASI 🔥 ===
+    navigator.mediaSession.setActionHandler("seekto", (details) => {
+      if (details.fastSeek && "fastSeek" in audio) {
+        audio.fastSeek(details.seekTime);
+      } else {
+        audio.currentTime = details.seekTime;
+      }
+      updatePositionState(); // Update posisi slider di HP
+    });
+  }
 }
 
 // Play/Pause
@@ -550,31 +626,49 @@ function renderLyrics(data) {
 function updateLyrics(currentTime) {
   if (!lrcData.length) return;
 
-  // Cari index lirik yang pas dengan waktu sekarang
+  // 1. Cari index
   let idx = lrcData.findIndex((line, i) => {
     const nextTime = lrcData[i + 1] ? lrcData[i + 1].time : Infinity;
     return currentTime >= line.time && currentTime < nextTime;
   });
 
-  // Jika index ditemukan dan berbeda dari yang terakhir aktif
+  // 2. Jika index baru
   if (idx !== -1 && idx !== lastActiveIndex) {
-    // Hapus class active dari baris sebelumnya
+    // Reset active class yang lama
     if (lastActiveIndex !== -1) {
       const prev = document.getElementById(`lyric-${lastActiveIndex}`);
       if (prev) prev.classList.remove("active");
     }
 
-    // Tambahkan class active ke baris sekarang
+    // Set active class yang baru
     const active = document.getElementById(`lyric-${idx}`);
     if (active) {
       active.classList.add("active");
 
-      // === SCROLL OTOMATIS (CENTER) ===
-      // Ini membuat lirik selalu di tengah container
-      active.scrollIntoView({
+      // === SCROLLING "KEBAL PELURU" (FIXED) ===
+
+      // Ambil kotak koordinat container lirik
+      const containerRect = lyricsEl.getBoundingClientRect();
+      // Ambil kotak koordinat baris lirik yang aktif
+      const activeRect = active.getBoundingClientRect();
+
+      // Hitung selisih posisi relatif baris lirik terhadap container
+      const relativeTop = activeRect.top - containerRect.top;
+
+      // Ambil posisi scroll saat ini
+      const currentScrollTop = lyricsEl.scrollTop;
+
+      // Rumus:
+      // Scroll Saat Ini + Selisih Posisi - (Setengah Tinggi Container) + (Setengah Tinggi Baris)
+      const targetScroll =
+        currentScrollTop +
+        relativeTop -
+        lyricsEl.clientHeight / 2 +
+        active.clientHeight / 2;
+
+      lyricsEl.scrollTo({
+        top: targetScroll,
         behavior: "smooth",
-        block: "center",
-        inline: "nearest",
       });
     }
 
@@ -1054,3 +1148,25 @@ window.onscroll = () => {
     }
   });
 };
+
+/* LOGIC KLIK KANAN (CONTEXT MENU) */
+const contextMenu = document.getElementById("contextMenu");
+
+// 1. Mencegah menu bawaan browser muncul
+document.addEventListener("contextmenu", (e) => {
+  e.preventDefault(); // Stop menu asli
+
+  // Hitung posisi biar gak keluar layar
+  let x = e.clientX;
+  let y = e.clientY;
+
+  // Tampilkan menu kita
+  contextMenu.style.left = `${x}px`;
+  contextMenu.style.top = `${y}px`;
+  contextMenu.classList.add("active");
+});
+
+// 2. Tutup menu kalau klik di tempat lain
+document.addEventListener("click", () => {
+  contextMenu.classList.remove("active");
+});

@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   try {
     // 👇 INI DIA UPDATE NYA: 'gemini-2.0-flash' 👇
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
       if (response.status === 404) {
         return res.status(404).json({
           error:
-            "Model tidak ditemukan. Coba ganti jadi gemini-2.0-flash-exp di kodenya.",
+            "Model tidak ditemukan. Coba ganti jadi gemini-2.5-flash-exp di kodenya.",
         });
       }
       return res
